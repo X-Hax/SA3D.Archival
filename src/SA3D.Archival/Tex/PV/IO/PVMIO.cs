@@ -151,7 +151,7 @@ namespace SA3D.Archival.Tex.PV.IO
 
 				writeData();
 
-				writer.Align(pad, start);
+				writer.AlignFrom(pad, start);
 
 				uint dataLength = writer.Position - dataStart;
 				writer.Stream.Seek(dataStart - 4, SeekOrigin.Begin);
@@ -239,7 +239,7 @@ namespace SA3D.Archival.Tex.PV.IO
 				}
 			}
 
-			writer.Align(32, start + 0x10);
+			writer.AlignFrom(32, start + 0x10);
 
 			// correct the last chunks length
 			uint correctedLength = writer.Position - lastDataChunk;

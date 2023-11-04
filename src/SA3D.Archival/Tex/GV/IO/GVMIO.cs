@@ -163,7 +163,7 @@ namespace SA3D.Archival.Tex.GV.IO
 				writeData();
 				writer.PopEndian();
 
-				writer.Align(pad, start);
+				writer.AlignFrom(pad, start);
 
 				uint dataLength = writer.Position - dataStart;
 				writer.Stream.Seek(dataStart - 4, SeekOrigin.Begin);

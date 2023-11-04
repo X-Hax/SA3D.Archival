@@ -90,7 +90,7 @@ namespace SA3D.Archival.Tex.PV.IO
 
 			if(pad)
 			{
-				writer.Align(32, start);
+				writer.AlignFrom(32, start);
 			}
 
 			uint dataLength = writer.Position - dataStart;

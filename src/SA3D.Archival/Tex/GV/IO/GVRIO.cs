@@ -124,7 +124,7 @@ namespace SA3D.Archival.Tex.GV.IO
 
 			if(pad)
 			{
-				writer.Align(32, start);
+				writer.AlignFrom(32, start);
 			}
 
 			uint dataLength = writer.Position - dataStart;
@@ -135,7 +135,7 @@ namespace SA3D.Archival.Tex.GV.IO
 
 			writer.PopEndian();
 		}
-		
+
 		public static byte AssembleDataFlagsAndPaletteFormat(bool mipmaps, GVPaletteFormat? paletteFormat, bool externalPalette)
 		{
 			GVRDataFlags result = default;
