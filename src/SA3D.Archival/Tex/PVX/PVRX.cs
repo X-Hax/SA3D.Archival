@@ -88,7 +88,10 @@ namespace SA3D.Archival.Tex.PVX
 		/// <returns>Whether the data can be read as a PVRX</returns>
 		public static bool CheckIsPVRX(byte[] data, uint address)
 		{
-			return CheckIsPVRX(new EndianStackReader(data), address);
+			using(EndianStackReader reader = new(data))
+			{
+				return CheckIsPVRX(reader, address);
+			}
 		}
 
 		/// <summary>
@@ -121,7 +124,10 @@ namespace SA3D.Archival.Tex.PVX
 		/// <returns>The PVRX that was read.</returns>
 		public static PVRX ReadPVRX(byte[] data, uint address)
 		{
-			return ReadPVRX(new EndianStackReader(data), address);
+			using(EndianStackReader reader = new(data))
+			{
+				return ReadPVRX(reader, address);
+			}
 		}
 
 		/// <summary>

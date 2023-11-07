@@ -143,7 +143,10 @@ namespace SA3D.Archival.Tex.GV
 		/// <returns>Whether the data can be read as a GVM</returns>
 		public static bool CheckIsGVM(byte[] data, uint address)
 		{
-			return CheckIsGVM(new EndianStackReader(data), address);
+			using(EndianStackReader reader = new(data))
+			{
+				return CheckIsGVM(reader, address);
+			}
 		}
 
 		/// <summary>
@@ -176,7 +179,10 @@ namespace SA3D.Archival.Tex.GV
 		/// <returns>The GVM texture that was read.</returns>
 		public static GVM ReadGVM(byte[] data, uint address)
 		{
-			return ReadGVM(new EndianStackReader(data), address);
+			using(EndianStackReader reader = new(data))
+			{
+				return ReadGVM(reader, address);
+			}
 		}
 
 		/// <summary>

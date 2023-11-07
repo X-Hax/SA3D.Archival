@@ -102,7 +102,10 @@ namespace SA3D.Archival.Tex.PVX
 		/// <returns>Whether the data can be read as a PVMX</returns>
 		public static bool CheckIsPVMX(byte[] data, uint address)
 		{
-			return CheckIsPVMX(new EndianStackReader(data), address);
+			using(EndianStackReader reader = new(data))
+			{
+				return CheckIsPVMX(data, address);
+			}
 		}
 
 		/// <summary>
@@ -135,7 +138,10 @@ namespace SA3D.Archival.Tex.PVX
 		/// <returns>The PVMX that was read.</returns>
 		public static PVMX ReadPVMX(byte[] data, uint address)
 		{
-			return ReadPVMX(new EndianStackReader(data), address);
+			using(EndianStackReader reader = new(data))
+			{
+				return ReadPVMX(data, address);
+			}
 		}
 
 		/// <summary>

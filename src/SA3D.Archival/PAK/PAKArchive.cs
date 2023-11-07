@@ -235,7 +235,10 @@ namespace SA3D.Archival.PAK
 		/// <returns></returns>
 		public static bool CheckIsPAKArchive(byte[] data, uint address)
 		{
-			return CheckIsPAKArchive(new EndianStackReader(data), address);
+			using(EndianStackReader reader = new(data))
+			{
+				return CheckIsPAKArchive(data, address);
+			}
 		}
 
 
@@ -311,7 +314,10 @@ namespace SA3D.Archival.PAK
 		/// <exception cref="InvalidArchiveException"/>
 		public static PAKArchive ReadPAKArchive(byte[] data, uint address, string folderName)
 		{
-			return ReadPAKArchive(new EndianStackReader(data), address, folderName);
+			using(EndianStackReader reader = new(data))
+			{
+				return ReadPAKArchive(reader, address, folderName);
+			}
 		}
 
 		/// <summary>

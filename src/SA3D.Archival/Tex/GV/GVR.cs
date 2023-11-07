@@ -144,7 +144,10 @@ namespace SA3D.Archival.Tex.GV
 		/// <returns>Whether the data can be read as a GVR</returns>
 		public static bool CheckIsGVR(byte[] data, uint address)
 		{
-			return CheckIsGVR(new EndianStackReader(data), address);
+			using(EndianStackReader reader = new(data))
+			{
+				return CheckIsGVR(reader, address);
+			}
 		}
 
 		/// <summary>
@@ -192,7 +195,10 @@ namespace SA3D.Archival.Tex.GV
 		/// <returns>The GVR that was read.</returns>
 		public static GVR ReadGVR(byte[] data, uint address, string name)
 		{
-			return ReadGVR(new EndianStackReader(data), address, name);
+			using(EndianStackReader reader = new(data))
+			{
+				return ReadGVR(reader, address, name);
+			}
 		}
 
 		/// <summary>
@@ -203,7 +209,7 @@ namespace SA3D.Archival.Tex.GV
 		/// <returns>The GVR that was read.</returns>
 		public static GVR ReadGVR(byte[] data, uint address)
 		{
-			return ReadGVR(new EndianStackReader(data), address);
+			return ReadGVR(data, address, string.Empty);
 		}
 
 		/// <summary>

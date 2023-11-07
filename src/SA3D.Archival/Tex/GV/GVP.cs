@@ -88,7 +88,10 @@ namespace SA3D.Archival.Tex.GV
 		/// <returns>Whether the data can be read as a GVP</returns>
 		public static bool CheckIsGVP(byte[] data, uint address)
 		{
-			return CheckIsGVP(new EndianStackReader(data), address);
+			using(EndianStackReader reader = new(data))
+			{
+				return CheckIsGVP(reader, address);
+			}
 		}
 
 		/// <summary>
@@ -127,6 +130,8 @@ namespace SA3D.Archival.Tex.GV
 			return ReadGVP(reader, address, string.Empty);
 		}
 
+
+
 		/// <summary>
 		/// Reads a GVP texture from byte data.
 		/// </summary>
@@ -136,7 +141,10 @@ namespace SA3D.Archival.Tex.GV
 		/// <returns>The GVP that was read.</returns>
 		public static GVP ReadGVP(byte[] data, uint address, string name)
 		{
-			return ReadGVP(new EndianStackReader(data), address, name);
+			using(EndianStackReader reader = new(data))
+			{
+				return ReadGVP(reader, address, name);
+			}
 		}
 
 		/// <summary>
@@ -147,7 +155,7 @@ namespace SA3D.Archival.Tex.GV
 		/// <returns>The GVP that was read.</returns>
 		public static GVP ReadGVP(byte[] data, uint address)
 		{
-			return ReadGVP(new EndianStackReader(data), address);
+			return ReadGVP(data, address, string.Empty);
 		}
 
 		/// <summary>

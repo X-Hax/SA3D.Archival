@@ -144,7 +144,10 @@ namespace SA3D.Archival.Tex.PV
 		/// <returns>Whether the data can be read as a PVR</returns>
 		public static bool CheckIsPVR(byte[] data, uint address)
 		{
-			return CheckIsPVR(new EndianStackReader(data), address);
+			using(EndianStackReader reader = new(data))
+			{
+				return CheckIsPVR(reader, address);
+			}
 		}
 
 		/// <summary>
@@ -192,7 +195,10 @@ namespace SA3D.Archival.Tex.PV
 		/// <returns>The PVR texture that was read.</returns>
 		public static PVR ReadPVR(byte[] data, uint address, string name)
 		{
-			return ReadPVR(new EndianStackReader(data), address, name);
+			using(EndianStackReader reader = new(data))
+			{
+				return ReadPVR(reader, address, name);
+			}
 		}
 
 		/// <summary>
@@ -203,7 +209,7 @@ namespace SA3D.Archival.Tex.PV
 		/// <returns>The PVR texture that was read.</returns>
 		public static PVR ReadPVR(byte[] data, uint address)
 		{
-			return ReadPVR(new EndianStackReader(data), address);
+			return ReadPVR(data, address, string.Empty);
 		}
 
 		/// <summary>

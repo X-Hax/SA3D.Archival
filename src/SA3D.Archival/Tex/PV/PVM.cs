@@ -126,7 +126,10 @@ namespace SA3D.Archival.Tex.PV
 		/// <returns>Whether the data can be read as a PVM</returns>
 		public static bool CheckIsPVM(byte[] data, uint address)
 		{
-			return CheckIsPVM(new EndianStackReader(data), address);
+			using(EndianStackReader reader = new(data))
+			{
+				return CheckIsPVM(reader, address);
+			}
 		}
 
 		/// <summary>
@@ -159,7 +162,10 @@ namespace SA3D.Archival.Tex.PV
 		/// <returns>The PVM texture that was read.</returns>
 		public static PVM ReadPVM(byte[] data, uint address)
 		{
-			return ReadPVM(new EndianStackReader(data), address);
+			using(EndianStackReader reader = new(data))
+			{
+				return ReadPVM(reader, address);
+			}
 		}
 
 		/// <summary>

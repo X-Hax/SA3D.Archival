@@ -163,7 +163,10 @@ namespace SA3D.Archival
 		/// <returns>The archive that was read.</returns>
 		public static Archive ReadArchive(byte[] data, uint address, string filename)
 		{
-			return ReadArchive(new EndianStackReader(data), address, filename);
+			using(EndianStackReader reader = new(data))
+			{
+				return ReadArchive(reader, address, filename);
+			}
 		}
 
 		/// <summary>

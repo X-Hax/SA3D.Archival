@@ -88,7 +88,10 @@ namespace SA3D.Archival.Tex.PV
 		/// <returns>Whether the data can be read as a PVP</returns>
 		public static bool CheckIsPVP(byte[] data, uint address)
 		{
-			return CheckIsPVP(new EndianStackReader(data), address);
+			using(EndianStackReader reader = new(data))
+			{
+				return CheckIsPVP(reader, address);
+			}
 		}
 
 		/// <summary>
@@ -136,7 +139,10 @@ namespace SA3D.Archival.Tex.PV
 		/// <returns>The PVP that was read.</returns>
 		public static PVP ReadPVP(byte[] data, uint address, string name)
 		{
-			return ReadPVP(new EndianStackReader(data), address, name);
+			using(EndianStackReader reader = new(data))
+			{
+				return ReadPVP(reader, address, name);
+			}
 		}
 
 		/// <summary>
@@ -147,7 +153,7 @@ namespace SA3D.Archival.Tex.PV
 		/// <returns>The PVP that was read.</returns>
 		public static PVP ReadPVP(byte[] data, uint address)
 		{
-			return ReadPVP(new EndianStackReader(data), address);
+			return ReadPVP(data, address, string.Empty);
 		}
 
 		/// <summary>

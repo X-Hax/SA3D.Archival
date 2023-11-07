@@ -56,7 +56,10 @@ namespace SA3D.Archival.Tex
 		/// <exception cref="InvalidArchiveException"></exception>
 		public static TextureArchive ReadTextureArchive(byte[] data, uint address)
 		{
-			return ReadTextureArchive(new EndianStackReader(data), address);
+			using(EndianStackReader reader = new(data))
+			{
+				return ReadTextureArchive(reader, address);
+			}
 		}
 
 		/// <summary>
