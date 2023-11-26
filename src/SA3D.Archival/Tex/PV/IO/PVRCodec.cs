@@ -20,9 +20,8 @@ namespace SA3D.Archival.Tex.PV.IO
 			PVRDataCodec dataCodec = PVRDataCodec.Create(pvr.DataFormat, pixelCodec);
 			ReadOnlySpan<byte> palette = DecodeInternalPalette(pvr, dataCodec, out _);
 
-			EndianStackReader data = pvr.CreateDataReader();
-			int textureAddress = data.Length - dataCodec.CalculateTextureSize(pvr.Width, pvr.Height);
-			ReadOnlySpan<byte> textureData = data.Slice(textureAddress);
+			int textureAddress = pvr.Data.Length - dataCodec.CalculateTextureSize(pvr.Width, pvr.Height);
+			ReadOnlySpan<byte> textureData = pvr.Data[textureAddress..];
 			return dataCodec.Decode(textureData, pvr.Width, pvr.Height, palette);
 		}
 
@@ -32,7 +31,7 @@ namespace SA3D.Archival.Tex.PV.IO
 			PVRDataCodec dataCodec = PVRDataCodec.Create(pvr.DataFormat, pixelCodec);
 			ReadOnlySpan<byte> palette = DecodeInternalPalette(pvr, dataCodec, out int paletteSize);
 
-			ReadOnlySpan<byte> data = pvr.CreateDataReader().Slice(paletteSize);
+			ReadOnlySpan<byte> data = pvr.Data[paletteSize..];
 			int offset = paletteSize + dataCodec.CalculateTextureSize(pvr.Width, pvr.Width);
 			int size = pvr.Width >> 1;
 			for(int i = 0; i < mipmapIndex; i++, size >>= 1)
@@ -51,7 +50,6 @@ namespace SA3D.Archival.Tex.PV.IO
 
 			if(paletteEntries > 0 && !dataCodec.NeedsExternalPalette)
 			{
-				EndianStackReader data = pvr.CreateDataReader();
 				PVPixelCodec pixelCodec = dataCodec.PixelCodec;
 
 				int srcAddress = 0;
@@ -59,7 +57,7 @@ namespace SA3D.Archival.Tex.PV.IO
 
 				for(int i = 0; i < paletteEntries; i += pixelCodec.Pixels)
 				{
-					pixelCodec.DecodePixel(data.Slice(srcAddress), result[(i * 4)..]);
+					pixelCodec.DecodePixel(pvr.Data[srcAddress..], result[(i * 4)..]);
 					srcAddress += pixelCodec.BytesPerPixel;
 				}
 

@@ -65,13 +65,16 @@ namespace SA3D.Archival.PAK
 			}
 
 			List<Texture> textures = new();
-			EndianStackReader infReader = infFile.CreateDataReader();
-			PAKTextureInfo[] info = new PAKTextureInfo[infReader.Length / PAKTextureInfo.StructSize];
-			uint addr = 0;
-			for(int i = 0; i < info.Length; i++)
+			PAKTextureInfo[] info = new PAKTextureInfo[infFile.Data.Length / PAKTextureInfo.StructSize];
+
+			using(EndianStackReader infReader = infFile.CreateDataReader())
 			{
-				info[i] = PAKTextureInfo.Read(infReader, addr);
-				addr += PAKTextureInfo.StructSize;
+				uint addr = 0;
+				for(int i = 0; i < info.Length; i++)
+				{
+					info[i] = PAKTextureInfo.Read(infReader, addr);
+					addr += PAKTextureInfo.StructSize;
+				}
 			}
 
 			for(int i = 0; i < info.Length; i++)
@@ -106,7 +109,7 @@ namespace SA3D.Archival.PAK
 		/// <inheritdoc/>
 		public override void WriteArchive(EndianStackWriter writer)
 		{
-			int totalLength = PAKEntries.Sum((a) => a.CreateDataReader().Length);
+			int totalLength = PAKEntries.Sum((a) => a.Data.Length);
 
 			writer.WriteUInt(_header);
 			writer.WriteEmpty(33);
@@ -123,13 +126,14 @@ namespace SA3D.Archival.PAK
 				writer.WriteString(item.LongPath.ToLower());
 				writer.WriteInt(fullname.Length);
 				writer.WriteString(fullname);
-				writer.WriteInt(item.CreateDataReader().Length);
-				writer.WriteInt(item.CreateDataReader().Length);
+
+				writer.WriteInt(item.Data.Length);
+				writer.WriteInt(item.Data.Length);
 			}
 
 			foreach(PAKEntry item in PAKEntries)
 			{
-				writer.Write(item.CreateDataReader().Source);
+				writer.Write(item.Data);
 			}
 		}
 

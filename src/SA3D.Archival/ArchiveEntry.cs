@@ -1,5 +1,6 @@
 ﻿using SA3D.Common.IO;
 using SA3D.Texturing;
+using System;
 
 namespace SA3D.Archival
 {
@@ -25,6 +26,11 @@ namespace SA3D.Archival
 			Name = name;
 			_data = data;
 		}
+
+		/// <summary>
+		/// Readonly access to the data.
+		/// </summary>
+		public ReadOnlySpan<byte> Data => _data;
 
 		/// <summary>
 		/// Creates a new Endian stack reader for reading the archive data.

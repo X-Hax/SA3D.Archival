@@ -14,7 +14,7 @@ namespace SA3D.Archival.Tex.GV.IO
 	{
 		public static byte[] Decode(GVR gvr)
 		{
-			return GVRPixelCodec.GetPixelCodec(gvr.PixelFormat).Decode(gvr.CreateDataReader().Source, gvr.Width, gvr.Height);
+			return GVRPixelCodec.GetPixelCodec(gvr.PixelFormat).Decode(gvr.Data, gvr.Width, gvr.Height);
 		}
 
 		public static byte[] DecodeMipmap(GVR gvr, int mipmapIndex)
@@ -28,7 +28,7 @@ namespace SA3D.Archival.Tex.GV.IO
 				offset += pixelCodec.CalculateTextureSize(size, size);
 			}
 
-			ReadOnlySpan<byte> data = gvr.CreateDataReader().Slice(offset);
+			ReadOnlySpan<byte> data = gvr.Data[offset..];
 
 			return pixelCodec.Decode(data, size, size);
 		}

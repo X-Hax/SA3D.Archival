@@ -19,6 +19,7 @@ namespace SA3D.Archival.Tex.PVX
 		/// <inheritdoc/>
 		public override IReadOnlyList<TextureArchiveEntry> TextureEntries => PVRXs;
 
+
 		/// <summary>
 		/// Creates a new empty PVMX archive.
 		/// </summary>
@@ -26,6 +27,7 @@ namespace SA3D.Archival.Tex.PVX
 		{
 			PVRXs = new();
 		}
+
 
 		/// <inheritdoc/>
 		public override void WriteContentIndex(TextWriter writer)
@@ -47,12 +49,6 @@ namespace SA3D.Archival.Tex.PVX
 
 				writer.WriteLine();
 			}
-		}
-
-		/// <inheritdoc/>
-		public override void WriteArchive(EndianStackWriter writer)
-		{
-			PVMXIO.WritePVMX(this, writer);
 		}
 
 		/// <summary>
@@ -154,5 +150,54 @@ namespace SA3D.Archival.Tex.PVX
 			return ReadPVMX(File.ReadAllBytes(filepath), 0);
 		}
 
+
+		/// <summary>
+		/// Writes a PVMX archive to an endian stack writer.
+		/// </summary>
+		/// <param name="writer">The writer to write to.</param>
+		public void WritePVMX(EndianStackWriter writer)
+		{
+			PVMXIO.WritePVMX(this, writer);
+		}
+
+		/// <summary>
+		/// Writes a PVMX archive to an endian stack writer.
+		/// </summary>
+		/// <param name="stream">The stream to write to.</param>
+		public void WritePVMX(Stream stream)
+		{
+			EndianStackWriter writer = new(stream);
+			WritePVMX(writer);
+		}
+
+		/// <summary>
+		/// Writes a PVMX archive to an endian stack writer.
+		/// </summary>
+		/// <param name="filepath">The path to the file to write to.</param>
+		public void WritePVMXToFile(string filepath)
+		{
+			using(FileStream stream = File.Create(filepath))
+			{
+				WritePVMX(stream);
+			}
+		}
+
+		/// <summary>
+		/// Writes a PVMX archive to a byte array.
+		/// </summary>
+		public byte[] WritePVMXToBytes()
+		{
+			using(MemoryStream stream = new())
+			{
+				WritePVMX(stream);
+				return stream.ToArray();
+			}
+		}
+
+		/// <inheritdoc/>
+		public override void WriteArchive(EndianStackWriter writer)
+		{
+			WritePVMX(writer);
+		}
 	}
 }

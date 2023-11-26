@@ -65,7 +65,6 @@ namespace SA3D.Archival.Tex.PV.IO
 
 		public static void WritePVR(PVR pvr, EndianStackWriter writer, bool includeGlobalIndex, bool pad)
 		{
-			EndianStackReader data = pvr.CreateDataReader();
 			uint start = writer.Position;
 
 			if(includeGlobalIndex)
@@ -86,7 +85,7 @@ namespace SA3D.Archival.Tex.PV.IO
 			writer.WriteEmpty(2);
 			writer.WriteUShort((ushort)pvr.Width);
 			writer.WriteUShort((ushort)pvr.Height);
-			writer.Write(data.Source);
+			writer.Write(pvr.Data);
 
 			if(pad)
 			{

@@ -80,7 +80,6 @@ namespace SA3D.Archival.Tex.GV.IO
 		{
 			writer.PushBigEndian(false);
 
-			EndianStackReader data = gvr.CreateDataReader();
 			uint start = writer.Position;
 
 			if(includeGlobalIndex)
@@ -120,7 +119,7 @@ namespace SA3D.Archival.Tex.GV.IO
 				writer.Write(paletteCodec.Encode(gvr.InternalPalette.ColorData));
 			}
 
-			writer.Write(data.Source);
+			writer.Write(gvr.Data);
 
 			if(pad)
 			{

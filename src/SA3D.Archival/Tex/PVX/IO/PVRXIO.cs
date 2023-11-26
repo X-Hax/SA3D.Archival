@@ -25,7 +25,7 @@ namespace SA3D.Archival.Tex.PVX.IO
 
 			uint result = writer.Position;
 			writer.WriteEmpty(8);
-			writer.WriteULong((ulong)pvrx.CreateDataReader().LongLength);
+			writer.WriteULong((ulong)pvrx.Data.Length);
 
 			return result;
 		}
@@ -37,7 +37,7 @@ namespace SA3D.Archival.Tex.PVX.IO
 			writer.WriteULong(position);
 			writer.SeekEnd();
 
-			writer.Write(pvrx.CreateDataReader().Source);
+			writer.Write(pvrx.Data);
 			writer.Align(4);
 		}
 
