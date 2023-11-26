@@ -1,4 +1,17 @@
-﻿
+﻿override SA3D.Archival.AFS.AFSArchive.Entries.get -> System.Collections.Generic.IReadOnlyList<SA3D.Archival.ArchiveEntry!>!
+override SA3D.Archival.AFS.AFSArchive.WriteArchive(SA3D.Common.IO.EndianStackWriter! writer) -> void
+override SA3D.Archival.AFS.AFSArchive.WriteContentIndex(System.IO.TextWriter! writer) -> void
+SA3D.Archival.AFS.AFSArchive
+SA3D.Archival.AFS.AFSArchive.AFSArchive() -> void
+SA3D.Archival.AFS.AFSArchive.AFSEntries.get -> System.Collections.Generic.List<SA3D.Archival.AFS.AFSEntry!>!
+SA3D.Archival.AFS.AFSArchive.WriteAFSArchive(SA3D.Common.IO.EndianStackWriter! writer) -> void
+SA3D.Archival.AFS.AFSArchive.WriteAFSArchive(System.IO.Stream! stream) -> void
+SA3D.Archival.AFS.AFSArchive.WriteAFSArchiveToBytes() -> byte[]!
+SA3D.Archival.AFS.AFSArchive.WriteAFSArchiveToFile(string! filepath) -> void
+SA3D.Archival.AFS.AFSEntry
+SA3D.Archival.AFS.AFSEntry.AFSEntry(byte[]! data, string! name, System.DateTime dateTime) -> void
+SA3D.Archival.AFS.AFSEntry.DateTime.get -> System.DateTime
+SA3D.Archival.AFS.AFSEntry.DateTime.set -> void
 SA3D.Archival.ArchiveEntry.Data.get -> System.ReadOnlySpan<byte>
 SA3D.Archival.Tex.GV.GVM.WriteGVMToBytes() -> byte[]!
 SA3D.Archival.Tex.PV.PVM.WritePVMToBytes() -> byte[]!
@@ -6,3 +19,9 @@ SA3D.Archival.Tex.PVX.PVMX.WritePVMX(SA3D.Common.IO.EndianStackWriter! writer) -
 SA3D.Archival.Tex.PVX.PVMX.WritePVMX(System.IO.Stream! stream) -> void
 SA3D.Archival.Tex.PVX.PVMX.WritePVMXToBytes() -> byte[]!
 SA3D.Archival.Tex.PVX.PVMX.WritePVMXToFile(string! filepath) -> void
+static SA3D.Archival.AFS.AFSArchive.CheckIsAFSArchive(byte[]! data, uint address) -> bool
+static SA3D.Archival.AFS.AFSArchive.CheckIsAFSArchive(SA3D.Common.IO.EndianStackReader! reader, uint address) -> bool
+static SA3D.Archival.AFS.AFSArchive.CheckIsAFSFileArchive(string! filepath) -> bool
+static SA3D.Archival.AFS.AFSArchive.ReadAFSArchive(byte[]! data, uint address) -> SA3D.Archival.AFS.AFSArchive!
+static SA3D.Archival.AFS.AFSArchive.ReadAFSArchive(SA3D.Common.IO.EndianStackReader! reader, uint address) -> SA3D.Archival.AFS.AFSArchive!
+static SA3D.Archival.AFS.AFSArchive.ReadAFSArchiveFromFile(string! filepath) -> SA3D.Archival.AFS.AFSArchive!

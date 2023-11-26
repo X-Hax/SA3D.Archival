@@ -1,4 +1,5 @@
-﻿using SA3D.Archival.PAK;
+﻿using SA3D.Archival.AFS;
+using SA3D.Archival.PAK;
 using SA3D.Archival.Tex;
 using SA3D.Common.IO;
 using SA3D.Texturing;
@@ -128,6 +129,10 @@ namespace SA3D.Archival
 			if(PAKArchive.CheckIsPAKArchive(reader, address))
 			{
 				return PAKArchive.ReadPAKArchive(reader, address, filename);
+			}
+			else if(AFSArchive.CheckIsAFSArchive(reader, address))
+			{
+				return AFSArchive.ReadAFSArchive(reader, address);
 			}
 			else
 			{
