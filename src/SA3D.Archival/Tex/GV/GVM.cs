@@ -273,7 +273,7 @@ namespace SA3D.Archival.Tex.GV
 		/// <summary>
 		/// Writes a GVM archive to a byte array. Includes all metadata in the archive header table.
 		/// </summary>
-		public byte[] WriteGVMToByte()
+		public byte[] WriteGVMToBytes()
 		{
 			return WriteGVMToBytes(GVMMetadataIncludes.IncludeAll);
 		}

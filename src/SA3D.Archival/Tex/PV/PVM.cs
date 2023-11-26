@@ -256,7 +256,7 @@ namespace SA3D.Archival.Tex.PV
 		/// <summary>
 		/// Writes a PVM archive to a byte array. Includes all metadata in the archive header table.
 		/// </summary>
-		public byte[] WritePVMToByte()
+		public byte[] WritePVMToBytes()
 		{
 			return WritePVMToBytes(PVMMetadataIncludes.IncludeAll);
 		}

@@ -101,7 +101,6 @@ SA3D.Archival.Tex.GV.GVM.WriteGVM(SA3D.Common.IO.EndianStackWriter! writer) -> v
 SA3D.Archival.Tex.GV.GVM.WriteGVM(SA3D.Common.IO.EndianStackWriter! writer, SA3D.Archival.Tex.GV.GVMMetadataIncludes includes) -> void
 SA3D.Archival.Tex.GV.GVM.WriteGVM(System.IO.Stream! stream) -> void
 SA3D.Archival.Tex.GV.GVM.WriteGVM(System.IO.Stream! stream, SA3D.Archival.Tex.GV.GVMMetadataIncludes includes) -> void
-SA3D.Archival.Tex.GV.GVM.WriteGVMToByte() -> byte[]!
 SA3D.Archival.Tex.GV.GVM.WriteGVMToBytes(SA3D.Archival.Tex.GV.GVMMetadataIncludes includes) -> byte[]!
 SA3D.Archival.Tex.GV.GVM.WriteGVMToFile(string! filepath) -> void
 SA3D.Archival.Tex.GV.GVM.WriteGVMToFile(string! filepath, SA3D.Archival.Tex.GV.GVMMetadataIncludes includes) -> void
@@ -178,7 +177,6 @@ SA3D.Archival.Tex.PV.PVM.WritePVM(SA3D.Common.IO.EndianStackWriter! writer) -> v
 SA3D.Archival.Tex.PV.PVM.WritePVM(SA3D.Common.IO.EndianStackWriter! writer, SA3D.Archival.Tex.PV.PVMMetadataIncludes includes) -> void
 SA3D.Archival.Tex.PV.PVM.WritePVM(System.IO.Stream! stream) -> void
 SA3D.Archival.Tex.PV.PVM.WritePVM(System.IO.Stream! stream, SA3D.Archival.Tex.PV.PVMMetadataIncludes includes) -> void
-SA3D.Archival.Tex.PV.PVM.WritePVMToByte() -> byte[]!
 SA3D.Archival.Tex.PV.PVM.WritePVMToBytes(SA3D.Archival.Tex.PV.PVMMetadataIncludes includes) -> byte[]!
 SA3D.Archival.Tex.PV.PVM.WritePVMToFile(string! filepath) -> void
 SA3D.Archival.Tex.PV.PVM.WritePVMToFile(string! filepath, SA3D.Archival.Tex.PV.PVMMetadataIncludes includes) -> void

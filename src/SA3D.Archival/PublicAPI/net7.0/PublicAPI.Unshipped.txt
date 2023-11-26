@@ -1,1 +1,2 @@
-﻿
+﻿SA3D.Archival.Tex.GV.GVM.WriteGVMToBytes() -> byte[]!
+SA3D.Archival.Tex.PV.PVM.WritePVMToBytes() -> byte[]!
