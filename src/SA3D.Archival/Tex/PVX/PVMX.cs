@@ -136,7 +136,7 @@ namespace SA3D.Archival.Tex.PVX
 		{
 			using(EndianStackReader reader = new(data))
 			{
-				return ReadPVMX(data, address);
+				return ReadPVMX(reader, address);
 			}
 		}
 

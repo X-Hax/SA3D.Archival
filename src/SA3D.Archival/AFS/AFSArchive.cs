@@ -141,7 +141,7 @@ namespace SA3D.Archival.AFS
 		{
 			using(EndianStackReader reader = new(data))
 			{
-				return ReadAFSArchive(data, address);
+				return ReadAFSArchive(reader, address);
 			}
 		}
 
