@@ -5,6 +5,9 @@ abstract SA3D.Archival.Archive.WriteContentIndex(System.IO.TextWriter! writer) -
 abstract SA3D.Archival.Tex.TextureArchive.TextureEntries.get -> System.Collections.Generic.IReadOnlyList<SA3D.Archival.Tex.TextureArchiveEntry!>!
 abstract SA3D.Archival.Tex.TextureArchiveEntry.InternalGetMipmap(int mipmapIndex) -> SA3D.Texturing.Texture!
 const SA3D.Archival.PAK.PAKTextureInfo.StructSize = 60 -> uint
+override SA3D.Archival.AFS.AFSArchive.Entries.get -> System.Collections.Generic.IReadOnlyList<SA3D.Archival.ArchiveEntry!>!
+override SA3D.Archival.AFS.AFSArchive.WriteArchive(SA3D.Common.IO.EndianStackWriter! writer) -> void
+override SA3D.Archival.AFS.AFSArchive.WriteContentIndex(System.IO.TextWriter! writer) -> void
 override SA3D.Archival.ArchiveEntry.ToString() -> string!
 override SA3D.Archival.PAK.PAKArchive.Entries.get -> System.Collections.Generic.IReadOnlyList<SA3D.Archival.ArchiveEntry!>!
 override SA3D.Archival.PAK.PAKArchive.ToTextureSet() -> SA3D.Texturing.TextureSet!
@@ -33,6 +36,17 @@ override SA3D.Archival.Tex.PVX.PVMX.WriteContentIndex(System.IO.TextWriter! writ
 override SA3D.Archival.Tex.PVX.PVRX.ToTexture() -> SA3D.Texturing.Texture!
 override SA3D.Archival.Tex.TextureArchiveEntry.ToString() -> string!
 override sealed SA3D.Archival.Tex.TextureArchive.Entries.get -> System.Collections.Generic.IReadOnlyList<SA3D.Archival.ArchiveEntry!>!
+SA3D.Archival.AFS.AFSArchive
+SA3D.Archival.AFS.AFSArchive.AFSArchive() -> void
+SA3D.Archival.AFS.AFSArchive.AFSEntries.get -> System.Collections.Generic.List<SA3D.Archival.AFS.AFSEntry!>!
+SA3D.Archival.AFS.AFSArchive.WriteAFSArchive(SA3D.Common.IO.EndianStackWriter! writer) -> void
+SA3D.Archival.AFS.AFSArchive.WriteAFSArchive(System.IO.Stream! stream) -> void
+SA3D.Archival.AFS.AFSArchive.WriteAFSArchiveToBytes() -> byte[]!
+SA3D.Archival.AFS.AFSArchive.WriteAFSArchiveToFile(string! filepath) -> void
+SA3D.Archival.AFS.AFSEntry
+SA3D.Archival.AFS.AFSEntry.AFSEntry(byte[]! data, string! name, System.DateTime dateTime) -> void
+SA3D.Archival.AFS.AFSEntry.DateTime.get -> System.DateTime
+SA3D.Archival.AFS.AFSEntry.DateTime.set -> void
 SA3D.Archival.Archive
 SA3D.Archival.Archive.Archive() -> void
 SA3D.Archival.Archive.WireContentIndexToLines() -> string!
@@ -43,6 +57,7 @@ SA3D.Archival.Archive.WriteContentIndexToFile(string! filepath) -> void
 SA3D.Archival.ArchiveEntry
 SA3D.Archival.ArchiveEntry.ArchiveEntry(byte[]! data, string! name) -> void
 SA3D.Archival.ArchiveEntry.CreateDataReader() -> SA3D.Common.IO.EndianStackReader!
+SA3D.Archival.ArchiveEntry.Data.get -> System.ReadOnlySpan<byte>
 SA3D.Archival.ArchiveEntry.Name.get -> string!
 SA3D.Archival.ArchiveEntry.Name.set -> void
 SA3D.Archival.InvalidArchiveException
@@ -101,6 +116,7 @@ SA3D.Archival.Tex.GV.GVM.WriteGVM(SA3D.Common.IO.EndianStackWriter! writer) -> v
 SA3D.Archival.Tex.GV.GVM.WriteGVM(SA3D.Common.IO.EndianStackWriter! writer, SA3D.Archival.Tex.GV.GVMMetadataIncludes includes) -> void
 SA3D.Archival.Tex.GV.GVM.WriteGVM(System.IO.Stream! stream) -> void
 SA3D.Archival.Tex.GV.GVM.WriteGVM(System.IO.Stream! stream, SA3D.Archival.Tex.GV.GVMMetadataIncludes includes) -> void
+SA3D.Archival.Tex.GV.GVM.WriteGVMToBytes() -> byte[]!
 SA3D.Archival.Tex.GV.GVM.WriteGVMToBytes(SA3D.Archival.Tex.GV.GVMMetadataIncludes includes) -> byte[]!
 SA3D.Archival.Tex.GV.GVM.WriteGVMToFile(string! filepath) -> void
 SA3D.Archival.Tex.GV.GVM.WriteGVMToFile(string! filepath, SA3D.Archival.Tex.GV.GVMMetadataIncludes includes) -> void
@@ -177,6 +193,7 @@ SA3D.Archival.Tex.PV.PVM.WritePVM(SA3D.Common.IO.EndianStackWriter! writer) -> v
 SA3D.Archival.Tex.PV.PVM.WritePVM(SA3D.Common.IO.EndianStackWriter! writer, SA3D.Archival.Tex.PV.PVMMetadataIncludes includes) -> void
 SA3D.Archival.Tex.PV.PVM.WritePVM(System.IO.Stream! stream) -> void
 SA3D.Archival.Tex.PV.PVM.WritePVM(System.IO.Stream! stream, SA3D.Archival.Tex.PV.PVMMetadataIncludes includes) -> void
+SA3D.Archival.Tex.PV.PVM.WritePVMToBytes() -> byte[]!
 SA3D.Archival.Tex.PV.PVM.WritePVMToBytes(SA3D.Archival.Tex.PV.PVMMetadataIncludes includes) -> byte[]!
 SA3D.Archival.Tex.PV.PVM.WritePVMToFile(string! filepath) -> void
 SA3D.Archival.Tex.PV.PVM.WritePVMToFile(string! filepath, SA3D.Archival.Tex.PV.PVMMetadataIncludes includes) -> void
@@ -246,6 +263,10 @@ SA3D.Archival.Tex.PV.PVRPixelFormat.YUV422 = 3 -> SA3D.Archival.Tex.PV.PVRPixelF
 SA3D.Archival.Tex.PVX.PVMX
 SA3D.Archival.Tex.PVX.PVMX.PVMX() -> void
 SA3D.Archival.Tex.PVX.PVMX.PVRXs.get -> System.Collections.Generic.List<SA3D.Archival.Tex.PVX.PVRX!>!
+SA3D.Archival.Tex.PVX.PVMX.WritePVMX(SA3D.Common.IO.EndianStackWriter! writer) -> void
+SA3D.Archival.Tex.PVX.PVMX.WritePVMX(System.IO.Stream! stream) -> void
+SA3D.Archival.Tex.PVX.PVMX.WritePVMXToBytes() -> byte[]!
+SA3D.Archival.Tex.PVX.PVMX.WritePVMXToFile(string! filepath) -> void
 SA3D.Archival.Tex.PVX.PVRX
 SA3D.Archival.Tex.PVX.PVRX.HasDimensions.get -> bool
 SA3D.Archival.Tex.PVX.PVRX.WritePVRX(SA3D.Common.IO.EndianStackWriter! writer) -> void
@@ -267,6 +288,12 @@ SA3D.Archival.Tex.TextureArchiveEntry.Width.get -> int
 SA3D.Archival.VectorQuantization
 static readonly SA3D.Archival.Tex.GV.GVMMetadataIncludes.IncludeAll -> SA3D.Archival.Tex.GV.GVMMetadataIncludes
 static readonly SA3D.Archival.Tex.PV.PVMMetadataIncludes.IncludeAll -> SA3D.Archival.Tex.PV.PVMMetadataIncludes
+static SA3D.Archival.AFS.AFSArchive.CheckIsAFSArchive(byte[]! data, uint address) -> bool
+static SA3D.Archival.AFS.AFSArchive.CheckIsAFSArchive(SA3D.Common.IO.EndianStackReader! reader, uint address) -> bool
+static SA3D.Archival.AFS.AFSArchive.CheckIsAFSFileArchive(string! filepath) -> bool
+static SA3D.Archival.AFS.AFSArchive.ReadAFSArchive(byte[]! data, uint address) -> SA3D.Archival.AFS.AFSArchive!
+static SA3D.Archival.AFS.AFSArchive.ReadAFSArchive(SA3D.Common.IO.EndianStackReader! reader, uint address) -> SA3D.Archival.AFS.AFSArchive!
+static SA3D.Archival.AFS.AFSArchive.ReadAFSArchiveFromFile(string! filepath) -> SA3D.Archival.AFS.AFSArchive!
 static SA3D.Archival.Archive.ReadArchive(byte[]! data, uint address) -> SA3D.Archival.Archive!
 static SA3D.Archival.Archive.ReadArchive(byte[]! data, uint address, string! filename) -> SA3D.Archival.Archive!
 static SA3D.Archival.Archive.ReadArchive(SA3D.Common.IO.EndianStackReader! reader, uint address) -> SA3D.Archival.Archive!
