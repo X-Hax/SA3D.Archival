@@ -296,7 +296,9 @@ namespace SA3D.Archival.Tex.GV
 			{
 				GVR pvr = GVRs[i];
 				string name = string.IsNullOrWhiteSpace(pvr.Name) ? i.ToString() : pvr.Name;
-				pvr.WriteGVRToFile($"{folderPath}\\{name}.gvr", includeGlobalIndices);
+
+				string gvrPath = Path.Join(folderPath, name + ".gvr");
+				pvr.WriteGVRToFile(gvrPath, includeGlobalIndices);
 			}
 		}
 
@@ -310,7 +312,8 @@ namespace SA3D.Archival.Tex.GV
 			{
 				GVP pvr = GVPs[i];
 				string name = string.IsNullOrWhiteSpace(pvr.Name) ? i.ToString() : pvr.Name;
-				pvr.WriteGVPToFile($"{folderPath}\\{name}.gvp");
+				string gvpPath = Path.Join(folderPath, name + ".gvp");
+				pvr.WriteGVPToFile(gvpPath);
 			}
 		}
 	}

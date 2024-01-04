@@ -279,7 +279,8 @@ namespace SA3D.Archival.Tex.PV
 			{
 				PVR pvr = PVRs[i];
 				string name = string.IsNullOrWhiteSpace(pvr.Name) ? i.ToString() : pvr.Name;
-				pvr.WritePVRToFile($"{folderPath}\\{name}.pvr", includeGlobalIndices);
+				string pvrPath = Path.Join(folderPath, name + ".pvr");
+				pvr.WritePVRToFile(pvrPath, includeGlobalIndices);
 			}
 		}
 
@@ -293,7 +294,8 @@ namespace SA3D.Archival.Tex.PV
 			{
 				PVP pvr = PVPs[i];
 				string name = string.IsNullOrWhiteSpace(pvr.Name) ? i.ToString() : pvr.Name;
-				pvr.WritePVPToFile($"{folderPath}\\{name}.pvp");
+				string pvpPath = Path.Join(folderPath, name + ".pvp");
+				pvr.WritePVPToFile(pvpPath);
 			}
 		}
 	}
