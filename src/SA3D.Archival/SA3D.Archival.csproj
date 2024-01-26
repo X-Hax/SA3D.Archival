@@ -11,7 +11,7 @@
 		<Title>SA3D Archival Library</Title>
 		<Product>SA3D Archival Library</Product>
 		<Description>Archive encoding and decoding library</Description>
-		<Version>1.1.0</Version>
+		<Version>1.1.1</Version>
 		<RepositoryUrl>https://github.com/X-Hax/SA3D.Archival</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/X-Hax/SA3D.Archival</PackageProjectUrl>
 		<PackageId>SA3D.Archival</PackageId>
