@@ -109,12 +109,7 @@ namespace SA3D.Archival.PAK
 		/// <param name="writer">The writer to write to.</param>
 		public readonly void Write(EndianStackWriter writer)
 		{
-			writer.WriteString(Name);
-			if(Name.Length < 28)
-			{
-				writer.WriteEmpty((uint)(28 - Name.Length));
-			}
-
+			writer.WriteString(Name, 28);
 			writer.WriteUInt(GlobalIndex);
 			writer.WriteUInt((uint)Type);
 			writer.WriteUInt(BitDepth);
