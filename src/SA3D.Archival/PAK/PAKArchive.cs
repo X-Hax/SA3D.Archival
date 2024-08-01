@@ -80,7 +80,9 @@ namespace SA3D.Archival.PAK
 			for(int i = 0; i < info.Length; i++)
 			{
 				PAKTextureInfo texInfo = info[i];
-				PAKEntry entry = PAKEntries.First(x => x.Name.StartsWith(texInfo.Name));
+
+				PAKEntry entry = PAKEntries.FirstOrDefault(x => x.Name == texInfo.Name)
+					?? PAKEntries.First(x => x.Name.StartsWith(texInfo.Name));
 
 				Texture tex = entry.ToTexture();
 
