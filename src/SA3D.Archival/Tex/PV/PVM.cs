@@ -45,9 +45,9 @@ namespace SA3D.Archival.Tex.PV
 		/// </summary>
 		public PVM() : base()
 		{
-			PVRs = new();
-			PVPs = new();
-			ModelNames = new();
+			PVRs = [];
+			PVPs = [];
+			ModelNames = [];
 			ConverterName = string.Empty;
 			Comment = string.Empty;
 		}
@@ -65,7 +65,7 @@ namespace SA3D.Archival.Tex.PV
 		/// <inheritdoc/>
 		public override TextureSet ToTextureSet()
 		{
-			List<Texture> textures = new();
+			List<Texture> textures = [];
 			foreach(PVR pvr in PVRs)
 			{
 				Texture texture = pvr.ToTexture();

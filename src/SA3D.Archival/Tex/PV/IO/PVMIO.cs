@@ -39,8 +39,8 @@ namespace SA3D.Archival.Tex.PV.IO
 			}
 
 			PVM result = new();
-			List<(string file, string args)> pvmiStrings = new();
-			List<byte[]> imgcData = new();
+			List<(string file, string args)> pvmiStrings = [];
+			List<byte[]> imgcData = [];
 			string paletteName = "";
 
 			while(dataAddress < data.Length)

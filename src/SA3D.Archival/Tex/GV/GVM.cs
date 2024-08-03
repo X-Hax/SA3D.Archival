@@ -45,9 +45,9 @@ namespace SA3D.Archival.Tex.GV
 		/// </summary>
 		public GVM() : base()
 		{
-			GVRs = new();
-			GVPs = new();
-			ModelNames = new();
+			GVRs = [];
+			GVPs = [];
+			ModelNames = [];
 			ConverterName = string.Empty;
 			Comment = string.Empty;
 		}
@@ -64,7 +64,7 @@ namespace SA3D.Archival.Tex.GV
 		/// <inheritdoc/>
 		public override TextureSet ToTextureSet()
 		{
-			List<Texture> textures = new();
+			List<Texture> textures = [];
 			foreach(GVR gvr in GVRs)
 			{
 				Texture texture = gvr.ToTexture();

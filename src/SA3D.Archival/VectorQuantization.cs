@@ -65,7 +65,7 @@ namespace SA3D.Archival
 			MaxIterations = maxIterations;
 			ChangeAndMergeThreshold = changeAndMergeThreshold;
 			Data = data;
-			Clusters = new();
+			Clusters = [];
 		}
 
 		private bool CheckDistinct()
@@ -314,7 +314,7 @@ namespace SA3D.Archival
 				throw new ArgumentException($"Data has invalid size! must be a multiple of {dimensions}");
 			}
 
-			Dictionary<string, VQDataPoint> datapoints = new();
+			Dictionary<string, VQDataPoint> datapoints = [];
 			for(int i = 0; i < data.Length; i += dimensions)
 			{
 				byte[] values = new byte[dimensions];

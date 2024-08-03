@@ -46,7 +46,7 @@ namespace SA3D.Archival.PAK
 		public PAKArchive(string folderName) : base()
 		{
 			FolderName = folderName;
-			PAKEntries = new();
+			PAKEntries = [];
 		}
 
 		/// <summary>
@@ -64,7 +64,7 @@ namespace SA3D.Archival.PAK
 				return base.ToTextureSet();
 			}
 
-			List<Texture> textures = new();
+			List<Texture> textures = [];
 			PAKTextureInfo[] info = new PAKTextureInfo[infFile.Data.Length / PAKTextureInfo.StructSize];
 
 			using(EndianStackReader infReader = infFile.CreateDataReader())

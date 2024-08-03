@@ -25,7 +25,7 @@ namespace SA3D.Archival.Tex.PVX
 		/// </summary>
 		public PVMX()
 		{
-			PVRXs = new();
+			PVRXs = [];
 		}
 
 

@@ -44,8 +44,8 @@ namespace SA3D.Archival.Tex.GV.IO
 			data.PopEndian();
 
 			GVM result = new();
-			List<(string file, string args)> GVmiStrings = new();
-			List<byte[]> imgcData = new();
+			List<(string file, string args)> GVmiStrings = [];
+			List<byte[]> imgcData = [];
 			string paletteName = "";
 
 			while(dataAddress < data.Length)

@@ -29,7 +29,7 @@ namespace SA3D.Archival.AFS
 		/// </summary>
 		public AFSArchive() : base()
 		{
-			AFSEntries = new();
+			AFSEntries = [];
 		}
 
 

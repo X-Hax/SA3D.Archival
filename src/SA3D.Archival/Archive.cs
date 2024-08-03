@@ -98,7 +98,7 @@ namespace SA3D.Archival
 		/// <returns></returns>
 		public virtual TextureSet ToTextureSet()
 		{
-			List<Texture> textures = new();
+			List<Texture> textures = [];
 
 			foreach(ArchiveEntry item in Entries)
 			{
