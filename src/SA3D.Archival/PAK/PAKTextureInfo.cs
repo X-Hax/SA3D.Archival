@@ -1,12 +1,12 @@
-﻿using SA3D.Archival.Tex.GV;
-using SA3D.Common.IO;
+﻿using Amicitia.IO.Binary;
+using SA3D.Archival.Textures.GV;
 
 namespace SA3D.Archival.PAK
 {
 	/// <summary>
 	/// Texture index for a single texture file in a PAK archive.
 	/// </summary>
-	public struct PAKTextureInfo
+	public struct PAKTextureInfo : IBinarySerializable
 	{
 		/// <summary>
 		/// Size of the structure.
@@ -26,7 +26,7 @@ namespace SA3D.Archival.PAK
 		/// <summary>
 		/// The type of the texture (?).
 		/// </summary>
-		public GVRPixelFormat Type { get; set; }
+		public GVTextureFormat Type { get; set; }
 
 		/// <summary>
 		/// Texture bitdepth.
@@ -36,7 +36,7 @@ namespace SA3D.Archival.PAK
 		/// <summary>
 		/// GVR Pixel format of the texture.
 		/// </summary>
-		public GVRPixelFormat PixelFormat { get; set; }
+		public GVTextureFormat PixelFormat { get; set; }
 
 		/// <summary>
 		/// Texture width in pixels.
@@ -58,66 +58,33 @@ namespace SA3D.Archival.PAK
 		/// </summary>
 		public PAKTextureAttributes Attributes { get; set; }
 
-		/// <summary>
-		/// Creates a new PAK texture info entry.
-		/// </summary>
-		/// <param name="name">Name of the texture.</param>
-		/// <param name="globalIndex">Global texture index.</param>
-		/// <param name="type">The type of the texture (?).</param>
-		/// <param name="bitDepth">Texture bitdepth.</param>
-		/// <param name="pixelFormat">GVR Pixel format of the texture.</param>
-		/// <param name="width">Texture width in pixels.</param>
-		/// <param name="height">Texture height in pixels.</param>
-		/// <param name="dataSize">Texture size in bytes.</param>
-		/// <param name="attributes">Additional texture info attributes.</param>
-		public PAKTextureInfo(string name, uint globalIndex, GVRPixelFormat type, uint bitDepth, GVRPixelFormat pixelFormat, uint width, uint height, uint dataSize, PAKTextureAttributes attributes)
+
+		/// <inheritdoc/>
+		public void Read(BinaryObjectReader reader)
 		{
-			Name = name;
-			GlobalIndex = globalIndex;
-			Type = type;
-			BitDepth = bitDepth;
-			PixelFormat = pixelFormat;
-			Width = width;
-			Height = height;
-			DataSize = dataSize;
-			Attributes = attributes;
+			Name = reader.ReadString(StringBinaryFormat.FixedLength, 28);
+			GlobalIndex = reader.ReadUInt32();
+			Type = (GVTextureFormat)reader.ReadUInt32();
+			BitDepth = reader.ReadUInt32();
+			PixelFormat = (GVTextureFormat)reader.ReadUInt32();
+			Width = reader.ReadUInt32();
+			Height = reader.ReadUInt32();
+			DataSize = reader.ReadUInt32();
+			Attributes = (PAKTextureAttributes)reader.ReadUInt32();
 		}
 
-		/// <summary>
-		/// Reads a texture info struct from an endian stack reader.
-		/// </summary>
-		/// <param name="reader">The reader to read from.</param>
-		/// <param name="address">The address at which to read the struct.</param>
-		/// <returns>The read struct.</returns>
-		public static PAKTextureInfo Read(EndianStackReader reader, uint address)
+		/// <inheritdoc/>
+		public readonly void Write(BinaryObjectWriter writer)
 		{
-			return new(
-				reader.ReadStringLimited(address, 28, out _),
-				reader.ReadUInt(address + 0x1C),
-				(GVRPixelFormat)reader.ReadUInt(address + 0x20),
-				reader.ReadUInt(address + 0x24),
-				(GVRPixelFormat)reader.ReadUInt(address + 0x28),
-				reader.ReadUInt(address + 0x2C),
-				reader.ReadUInt(address + 0x30),
-				reader.ReadUInt(address + 0x34),
-				(PAKTextureAttributes)reader.ReadUInt(address + 0x38));
-		}
-
-		/// <summary>
-		/// Writes the texture info as a struct to an endian stack writer.
-		/// </summary>
-		/// <param name="writer">The writer to write to.</param>
-		public readonly void Write(EndianStackWriter writer)
-		{
-			writer.WriteString(Name, 28);
-			writer.WriteUInt(GlobalIndex);
-			writer.WriteUInt((uint)Type);
-			writer.WriteUInt(BitDepth);
-			writer.WriteUInt((uint)PixelFormat);
-			writer.WriteUInt(Width);
-			writer.WriteUInt(Height);
-			writer.WriteUInt(DataSize);
-			writer.WriteUInt((uint)Attributes);
+			writer.WriteString(StringBinaryFormat.FixedLength, Name, 28);
+			writer.WriteUInt32(GlobalIndex);
+			writer.WriteUInt32((uint)Type);
+			writer.WriteUInt32(BitDepth);
+			writer.WriteUInt32((uint)PixelFormat);
+			writer.WriteUInt32(Width);
+			writer.WriteUInt32(Height);
+			writer.WriteUInt32(DataSize);
+			writer.WriteUInt32((uint)Attributes);
 		}
 
 		/// <inheritdoc/>

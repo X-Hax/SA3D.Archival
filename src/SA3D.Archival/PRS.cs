@@ -9,146 +9,148 @@ namespace SA3D.Archival
 	public static class PRS
 	{
 		/// <summary>
-		/// Attempts to read a PRS file and decompress it. Only decompresses if the file ends with ".prs".
+		/// Decompresses PRS data in a stream
 		/// </summary>
-		/// <param name="filepath">The path to the file to read.</param>
-		/// <returns>The uncompressed file data.</returns>
-		public static byte[] ReadPRSFile(string filepath)
-		{
-			byte[] source = File.ReadAllBytes(filepath);
-			if(Path.GetExtension(filepath).ToLowerInvariant() == ".prs")
-			{
-				source = DecompressPRS(source);
-			}
-
-			return source;
-		}
-
-		private static uint DecompressPRS(byte[] data, byte[]? result)
+		/// <param name="source"></param>
+		/// <param name="destination"></param>
+		/// <returns></returns>
+		public static long Decompress(Stream source, Stream destination)
 		{
 			uint bitpos = 9;
-			uint r3, r5;
+			int reuseCount;
+			int reuseOffset;
 			int offset;
 
-			byte currentByte = data[0];
-			uint sourceAddr = 1;
-			uint resultAddr = 0;
+			int currentByte = source.ReadByte();
+			long start = destination.Position;
+
+			byte[] reuseBuffer = new byte[256];
 
 			while(true)
 			{
 				bitpos--;
 				if(bitpos == 0)
 				{
-					currentByte = data[sourceAddr];
+					currentByte = source.ReadByte();
 					bitpos = 8;
-					sourceAddr++;
 				}
 
 				bool flag = (currentByte & 1) == 1;
 				currentByte >>= 1;
 				if(flag)
 				{
-					result?.SetValue(data[sourceAddr], resultAddr);
-					sourceAddr++;
-					resultAddr++;
+					destination.WriteByte((byte)source.ReadByte());
 					continue;
 				}
 
 				bitpos--;
 				if(bitpos == 0)
 				{
-					currentByte = data[sourceAddr];
+					currentByte = source.ReadByte();
 					bitpos = 8;
-					sourceAddr++;
 				}
 
 				flag = (currentByte & 1) == 1;
 				currentByte >>= 1;
 				if(flag)
 				{
-					r3 = data[sourceAddr] & 0xFFu;
-					offset = (int)(((data[sourceAddr + 1] & 0xFFu) << 8) | r3);
-					sourceAddr += 2;
+					offset = source.ReadByte() | (source.ReadByte() << 8);
 					if(offset == 0)
 					{
-						return resultAddr;
+						return destination.Position - start;
 					}
 
-					r3 &= 0x7;
-					r5 = (uint)(offset >> 3) | 0xFFFFE000;
-					if(r3 == 0)
+					reuseCount = offset & 0x7;
+					reuseOffset = unchecked((int)((uint)(offset >> 3) | 0xFFFFE000u));
+					if(reuseCount == 0)
 					{
-						r3 = data[sourceAddr] & 0xFFu;
-						sourceAddr++;
-						r3++;
+						reuseCount = source.ReadByte() + 1;
 					}
 					else
 					{
-						r3 += 2;
+						reuseCount += 2;
 					}
-
-					r5 += resultAddr;
 				}
 				else
 				{
-					r3 = 0;
+					reuseCount = 0;
 					for(int i = 0; i < 2; i++)
 					{
 						bitpos--;
 						if(bitpos == 0)
 						{
-							currentByte = data[sourceAddr];
+							currentByte = source.ReadByte();
 							bitpos = 8;
-							sourceAddr++;
 						}
 
 						flag = (currentByte & 1) == 1;
 						currentByte >>= 1;
-						offset = (int)r3 << 1;
-						r3 = (uint)(offset | (flag ? 1 : 0));
+						reuseCount = (reuseCount << 1) | (flag ? 1 : 0);
 					}
 
-					offset = unchecked((int)(data[sourceAddr] | 0xFFFFFF00));
-					r3 += 2;
-					sourceAddr++;
-					r5 = (uint)offset + resultAddr;
+					reuseOffset = unchecked((int)(source.ReadByte() | 0xFFFFFF00u));
+					reuseCount += 2;
 				}
 
-				if(r3 == 0)
+				int reuseBufferSize = Math.Min(-reuseOffset, reuseCount);
+
+				long currentPosition = destination.Position;
+				destination.Seek(reuseOffset, SeekOrigin.Current);
+				_ = destination.Read(reuseBuffer, 0, reuseBufferSize);
+				destination.Seek(currentPosition, SeekOrigin.Begin);
+
+				int repeatCount = reuseCount / reuseBufferSize;
+				for(int i = 0; i < repeatCount; i++)
 				{
-					continue;
+					destination.Write(reuseBuffer, 0, reuseBufferSize);
 				}
 
-				uint count = r3;
-				for(int i = 0; i < count; i++)
+				int repeatRemainder = reuseCount % reuseBufferSize;
+				if(repeatRemainder > 0)
 				{
-					result?.SetValue(result[r5], resultAddr);
-					r5++;
-					r3++;
-					resultAddr++;
+					destination.Write(reuseBuffer, 0, repeatRemainder);
 				}
 			}
 		}
 
 		/// <summary>
-		/// Decompresses PRS data.
+		/// Decompresses PRS data from a stream
 		/// </summary>
-		/// <param name="data">The PRS data to decompress.</param>
-		/// <param name="outLength">Output length of the data. Pass 0 if unknown.</param>
+		/// <param name="source"></param>
 		/// <returns></returns>
-		public static byte[] DecompressPRS(byte[] data, uint outLength = 0)
+		public static byte[] Decompress(Stream source)
 		{
-			if(outLength == 0)
-			{
-				outLength = DecompressPRS(data, null);
-			}
-
-			byte[] result = new byte[outLength];
-			DecompressPRS(data, result);
-			return result;
+			using MemoryStream destination = new();
+			Decompress(source, destination);
+			return destination.ToArray();
 		}
 
-		private class PrsCompressor
+		/// <summary>
+		/// Reads a PRS compressed file
+		/// </summary>
+		/// <param name="filepath">The path to the file to read.</param>
+		/// <returns>The uncompressed file data.</returns>
+		public static byte[] DecompressFile(string filepath)
+		{
+			using FileStream filestream = File.OpenRead(filepath);
+			using MemoryStream destination = new();
+			Decompress(filestream, destination);
+			return destination.ToArray();
+		}
+
+		/// <summary>
+		/// Decompresses PRS byte data
+		/// </summary>
+		/// <param name="data">The PRS data to decompress.</param>
+		/// <returns></returns>
+		public static byte[] DecompressBytes(byte[] data)
+		{
+			using MemoryStream source = new(data);
+			return Decompress(source);
+		}
+
+
+		private class Compressor
 		{
 			private byte _bitPos;
 			private readonly byte[] _data;
@@ -186,7 +188,7 @@ namespace SA3D.Archival
 				}
 			}
 
-			public PrsCompressor(byte[] data)
+			public Compressor(byte[] data)
 			{
 				_data = data;
 				_result = new byte[data.Length];
@@ -327,9 +329,9 @@ namespace SA3D.Archival
 		/// </summary>
 		/// <param name="data">Data to compress.</param>
 		/// <returns>The compressed data.</returns>
-		public static byte[] CompressPRS(byte[] data)
+		public static byte[] Compress(byte[] data)
 		{
-			return data.Length == 0 ? data : new PrsCompressor(data).Compress();
+			return data.Length == 0 ? data : new Compressor(data).Compress();
 		}
 	}
 }
