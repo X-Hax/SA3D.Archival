@@ -16,7 +16,7 @@ namespace SA3D.Archival.Textures.PV
 	/// <summary>
 	/// "PVP" Palette storage medium used in dreamcast games
 	/// </summary>
-	public class PVPalette : BaseVPalette
+	public sealed class PVPalette : BaseVPalette
 	{
 		private PVPixelCodec _codec;
 

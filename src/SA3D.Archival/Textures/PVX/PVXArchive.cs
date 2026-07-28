@@ -12,7 +12,7 @@ namespace SA3D.Archival.Textures.PVX
 	/// <summary>
 	/// PVM. Based on PVM, designed by SF94.
 	/// </summary>
-	public class PVXArchive : ITextureArchive
+	public sealed class PVXArchive : ITextureArchive
 	{
 		private const uint _pvmxHeader = 0x584D5650;
 		private const byte _version = 1;

@@ -7,7 +7,6 @@ using SA3D.Common.IO;
 using SA3D.Texturing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using GVArchiveIO = SA3D.Archival.Textures.CommonV.IO.VArchiveIO<
 	SA3D.Archival.Textures.GV.GVArchive,
 	SA3D.Archival.Textures.GV.GVTexture,
@@ -24,7 +23,7 @@ namespace SA3D.Archival.Textures.GV
 	/// <summary>
 	/// GV Texture archive encoding used in Dreamcast/Gamecube games and their ports.
 	/// </summary>
-	public class GVArchive : BaseVArchive<GVTexture, GVPalette>
+	public sealed class GVArchive : BaseVArchive<GVTexture, GVPalette>
 	{
 		/// <summary>
 		/// Creates a new empty GVM archive.

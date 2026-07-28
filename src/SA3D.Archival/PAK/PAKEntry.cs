@@ -7,7 +7,7 @@ namespace SA3D.Archival.PAK
 	/// <summary>
 	/// A single PAK archive entry.
 	/// </summary>
-	public class PAKEntry : IArchiveEntry
+	public sealed class PAKEntry : IArchiveEntry
 	{
 		/// <summary>
 		/// The entries binary data

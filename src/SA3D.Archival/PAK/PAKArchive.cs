@@ -15,7 +15,7 @@ namespace SA3D.Archival.PAK
 	/// <summary>
 	/// Generic archive format used in Sonic Adventure 2 PC.
 	/// </summary>
-	public class PAKArchive : IArchive
+	public sealed class PAKArchive : IArchive
 	{
 		/// <summary>
 		/// PAK File header (START PAK)

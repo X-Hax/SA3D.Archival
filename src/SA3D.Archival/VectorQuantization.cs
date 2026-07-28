@@ -8,7 +8,7 @@ namespace SA3D.Archival
 	/// <summary>
 	/// Vector quantization algorithm.
 	/// </summary>
-	public class VectorQuantization
+	public sealed class VectorQuantization
 	{
 		#region helper types
 

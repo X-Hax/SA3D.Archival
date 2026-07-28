@@ -17,7 +17,7 @@ namespace SA3D.Archival.Textures.GV
 	/// <summary>
 	/// Texture storage medium used in gamecube games.
 	/// </summary>
-	public class GVTexture : BaseVTexture
+	public sealed class GVTexture : BaseVTexture
 	{
 		private GVTextureCodec _codec;
 

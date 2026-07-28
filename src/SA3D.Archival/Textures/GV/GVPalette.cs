@@ -16,7 +16,7 @@ namespace SA3D.Archival.Textures.GV
 	/// <summary>
 	/// Palette storage medium used in gamecube games.
 	/// </summary>
-	public class GVPalette : BaseVPalette
+	public sealed class GVPalette : BaseVPalette
 	{
 		private GVPaletteCodec _codec;
 

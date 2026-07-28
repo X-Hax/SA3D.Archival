@@ -4,7 +4,6 @@ using SA3D.Archival.Textures.CommonV.IO.Blocks;
 using SA3D.Common.IO;
 using System;
 using System.Collections.Generic;
-using System.Reflection.PortableExecutable;
 
 namespace SA3D.Archival.Textures.CommonV.IO
 {

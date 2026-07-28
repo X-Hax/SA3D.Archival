@@ -17,7 +17,7 @@ namespace SA3D.Archival.Textures.PV
 	/// <summary>
 	/// "PVR" Texture storage medium c
 	/// </summary>
-	public class PVTexture : BaseVTexture
+	public sealed class PVTexture : BaseVTexture
 	{
 		private PVRDataCodec _codec;
 

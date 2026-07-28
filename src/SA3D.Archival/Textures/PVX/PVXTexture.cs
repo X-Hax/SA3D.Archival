@@ -16,7 +16,7 @@ namespace SA3D.Archival.Textures.PVX
 	/// <summary>
 	/// Texture storage medium to store texture readable by DirectX. Based on PVR, designed by SF94.
 	/// </summary>
-	public class PVXTexture : ITextureArchiveEntry
+	public sealed class PVXTexture : ITextureArchiveEntry
 	{
 		private const uint _pvrxHeader = 0x58525650;
 		private const byte _version = 1;

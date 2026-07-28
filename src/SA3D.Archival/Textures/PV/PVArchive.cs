@@ -24,7 +24,7 @@ namespace SA3D.Archival.Textures.PV
 	/// <summary>
 	/// PV Texture archive encoding used in Dreamcast/Gamecube games and their ports.
 	/// </summary>
-	public class PVArchive : BaseVArchive<PVTexture, PVPalette>
+	public sealed class PVArchive : BaseVArchive<PVTexture, PVPalette>
 	{
 		/// <summary>
 		/// Creates a new empty PVM archive.

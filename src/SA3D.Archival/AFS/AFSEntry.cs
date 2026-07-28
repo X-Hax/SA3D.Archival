@@ -5,7 +5,7 @@ namespace SA3D.Archival.AFS
 	/// <summary>
 	/// AFS Archive entry.
 	/// </summary>
-	public class AFSEntry : IArchiveEntry
+	public sealed class AFSEntry : IArchiveEntry
 	{
 		/// <summary>
 		/// The entries binary data

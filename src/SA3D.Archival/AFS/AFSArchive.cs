@@ -11,7 +11,7 @@ namespace SA3D.Archival.AFS
 	/// <summary>
 	/// Generic archive format used by various SEGA games.
 	/// </summary>
-	public class AFSArchive : IArchive
+	public sealed class AFSArchive : IArchive
 	{
 		/// <summary>
 		/// AFS File header.
