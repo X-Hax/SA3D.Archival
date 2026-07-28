@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace SA3D.Archival
 {
 	/// <summary>
 	/// Vector quantization algorithm.
 	/// </summary>
-	public class VectorQuantization
+	public sealed class VectorQuantization
 	{
 		#region helper types
 
@@ -280,18 +281,18 @@ namespace SA3D.Archival
 			}
 		}
 
-		private int[] GetIndexMap(ReadOnlySpan<byte> data)
+		private I[] GetIndexMap<I>(ReadOnlySpan<byte> data) where I : INumber<I>
 		{
 			if(data.Length % Dimensions != 0)
 			{
 				throw new ArgumentException($"Data has invalid size! must be a multiple of {Dimensions}");
 			}
 
-			int[] indices = new int[data.Length / Dimensions];
+			I[] indices = new I[data.Length / Dimensions];
 
 			for(int i = 0; i < indices.Length; i++)
 			{
-				indices[i] = GetClosestClusterIndex(data[(i * Dimensions)..], out _);
+				indices[i] = I.CreateTruncating(GetClosestClusterIndex(data[(i * Dimensions)..], out _));
 			}
 
 			return indices;
@@ -307,7 +308,7 @@ namespace SA3D.Archival
 		/// <param name="changeAndMergeThreshold">Value difference threshold below which values should be recalculated/merged.</param>
 		/// <returns>Clusters and corresponding index mapping.</returns>
 		/// <exception cref="ArgumentException"></exception>
-		public static (int[] indices, byte[] clusters) QuantizeByteData(ReadOnlySpan<byte> data, int dimensions, int clusterLimit, int maxIterations = 10, int changeAndMergeThreshold = 31)
+		public static (I[] indices, byte[] clusters) QuantizeByteData<I>(ReadOnlySpan<byte> data, int dimensions, int clusterLimit, int maxIterations = 10, int changeAndMergeThreshold = 31) where I : INumber<I>
 		{
 			if(data.Length % dimensions != 0)
 			{
@@ -345,7 +346,7 @@ namespace SA3D.Archival
 				result.Calculate();
 			}
 
-			int[] indices = result.GetIndexMap(data);
+			I[] indices = result.GetIndexMap<I>(data);
 			byte[] clusters = result.Clusters.SelectMany(x => x).ToArray();
 
 			return (indices, clusters);

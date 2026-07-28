@@ -1,7 +1,10 @@
-﻿using SA3D.Archival.Tex.GV;
+﻿using Amicitia.IO.Binary;
+using Amicitia.IO.Streams;
+using SA3D.Archival.Textures.GV;
 using SA3D.Common.Ini;
 using SA3D.Common.IO;
 using SA3D.Texturing;
+using SA3D.Texturing.IO;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,31 +15,29 @@ namespace SA3D.Archival.PAK
 	/// <summary>
 	/// Generic archive format used in Sonic Adventure 2 PC.
 	/// </summary>
-	public class PAKArchive : Archive
+	public sealed class PAKArchive : IArchive
 	{
 		/// <summary>
 		/// PAK File header (START PAK)
 		/// </summary>
 		private const uint _header = 0x6B617001;
 
-		private string _foldername = string.Empty;
-
 		/// <summary>
 		/// The name of the folder that the PAK archive compresses.
 		/// </summary>
 		public string FolderName
 		{
-			get => _foldername;
-			set => _foldername = value.ToLowerInvariant();
-		}
+			get;
+			set => field = value.ToLowerInvariant();
+		} = string.Empty;
 
 		/// <summary>
 		/// PAK files in the archive.
 		/// </summary>
-		public List<PAKEntry> PAKEntries { get; }
+		public List<PAKEntry> Entries { get; private set; }
 
 		/// <inheritdoc/>
-		public override IReadOnlyList<ArchiveEntry> Entries => PAKEntries;
+		IReadOnlyList<IArchiveEntry> IArchive.Entries => Entries;
 
 
 		/// <summary>
@@ -46,7 +47,7 @@ namespace SA3D.Archival.PAK
 		public PAKArchive(string folderName) : base()
 		{
 			FolderName = folderName;
-			PAKEntries = [];
+			Entries = [];
 		}
 
 		/// <summary>
@@ -56,24 +57,134 @@ namespace SA3D.Archival.PAK
 
 
 		/// <inheritdoc/>
-		public override TextureSet ToTextureSet()
+		public bool Check(BinaryObjectReader reader)
 		{
-			ArchiveEntry? infFile = Entries.FirstOrDefault(x => x.Name.EndsWith(".inf"));
-			if(infFile == null)
+			using SeekToken seekToken = reader.At();
+			using EndiannessToken endiannessToken = reader.WithEndian(Endianness.Little);
+
+			return reader.ReadUInt32() == _header;
+		}
+
+		/// <inheritdoc/>
+		public void Read(BinaryObjectReader reader, FileContext context)
+		{
+			if(context.Filepath != null)
 			{
-				return base.ToTextureSet();
+				FolderName = Path.GetFileNameWithoutExtension(context.Filepath);
 			}
 
-			List<Texture> textures = [];
-			PAKTextureInfo[] info = new PAKTextureInfo[infFile.Data.Length / PAKTextureInfo.StructSize];
+			Entries = [];
 
-			using(EndianStackReader infReader = infFile.CreateDataReader())
+			reader.Skip(0x39);
+
+			int numfiles = reader.ReadInt32();
+			(string longpath, string name, int length)[] fileInfo
+				= new (string longpath, string name, int length)[numfiles];
+
+
+			for(int i = 0; i < numfiles; i++)
 			{
-				uint addr = 0;
-				for(int i = 0; i < info.Length; i++)
+				int stringLength = reader.ReadInt32();
+				string longPath = reader.ReadString(Encoding.ASCII, StringBinaryFormat.FixedLength, stringLength);
+
+				stringLength = reader.ReadInt32();
+				string name = reader.ReadString(Encoding.ASCII, StringBinaryFormat.FixedLength, stringLength);
+
+				int length = reader.ReadInt32();
+				reader.Skip(sizeof(int));
+
+				fileInfo[i] = (longPath, name, length);
+			}
+
+			for(int i = 0; i < numfiles; i++)
+			{
+				(string longpath, string name, int length) = fileInfo[i];
+				byte[] entryData = reader.ReadArray<byte>(length);
+				Entries.Add(new(entryData, Path.GetFileName(name), longpath));
+			}
+		}
+
+		/// <inheritdoc/>
+		public void Write(BinaryObjectWriter writer, FileContext context)
+		{
+			int totalLength = Entries.Sum((a) => a.Data.Length);
+
+			writer.WriteUInt32(_header);
+			writer.Skip(33);
+			writer.WriteInt32(Entries.Count);
+			writer.WriteInt32(totalLength);
+			writer.WriteInt32(totalLength);
+			writer.Skip(8);
+			writer.WriteInt32(Entries.Count);
+
+			foreach(PAKEntry item in Entries)
+			{
+				writer.WriteInt32(item.LongPath.Length);
+				writer.WriteString(Encoding.ASCII, StringBinaryFormat.FixedLength, item.LongPath.ToLower(), item.LongPath.Length);
+
+				string fullname = $"{FolderName}\\{item.Name}".ToLower();
+				writer.WriteInt32(fullname.Length);
+				writer.WriteString(Encoding.ASCII, StringBinaryFormat.FixedLength, fullname, fullname.Length);
+
+				writer.WriteInt32(item.Data.Length);
+				writer.WriteInt32(item.Data.Length);
+			}
+
+			foreach(PAKEntry item in Entries)
+			{
+				writer.WriteArray(item.Data);
+			}
+		}
+
+		/// <inheritdoc/>
+		public string WriteContentIndex()
+		{
+			Dictionary<string, PAKIniItem> list = new(Entries.Count);
+			foreach(PAKEntry item in Entries)
+			{
+				list.Add($"{FolderName}\\{item.Name}", new(item.LongPath));
+			}
+
+			using StringWriter writer = new();
+			IniSerializer.Serialize(list).Write(writer);
+			return writer.ToString();
+		}
+
+
+		/// <summary>
+		/// Converts the archive to a texture set. Entries that cannot be converted to textures are ignored.
+		/// </summary>
+		/// <returns></returns>
+		public TextureSet ToTextureSet()
+		{
+			List<Texture> textures = [];
+
+			PAKEntry? infFile = Entries.FirstOrDefault(x => x.Name.EndsWith(".inf"));
+			if(infFile == null)
+			{
+				foreach(PAKEntry item in Entries)
 				{
-					info[i] = PAKTextureInfo.Read(infReader, addr);
-					addr += PAKTextureInfo.StructSize;
+					try
+					{
+						textures.Add(item.ReadTextureFromData());
+					}
+					catch
+					{
+						continue;
+					}
+				}
+
+				return new(textures);
+			}
+
+			int infoCount = (int)(infFile.Data.Length / PAKTextureInfo.StructSize);
+			PAKTextureInfo[] info;
+
+			using(MemoryStream stream = new(infFile.Data))
+			{
+				using(BinaryObjectReader infReader = new(stream, StreamOwnership.Retain, Endianness.Little))
+				{
+					info = infReader.ReadObjectArray<PAKTextureInfo>(infoCount);
 				}
 			}
 
@@ -81,10 +192,10 @@ namespace SA3D.Archival.PAK
 			{
 				PAKTextureInfo texInfo = info[i];
 
-				PAKEntry entry = PAKEntries.FirstOrDefault(x => x.Name == texInfo.Name)
-					?? PAKEntries.First(x => x.Name.StartsWith(texInfo.Name));
+				PAKEntry entry = Entries.FirstOrDefault(x => x.Name == texInfo.Name)
+					?? Entries.First(x => x.Name.StartsWith(texInfo.Name));
 
-				Texture tex = entry.ToTexture();
+				Texture tex = entry.ReadTextureFromData();
 
 				tex.GlobalIndex = texInfo.GlobalIndex;
 				tex.Name = Path.GetFileNameWithoutExtension(texInfo.Name);
@@ -93,52 +204,8 @@ namespace SA3D.Archival.PAK
 				textures.Add(tex);
 			}
 
-			return new(textures.ToArray());
+			return new(textures);
 		}
-
-		/// <inheritdoc/>
-		public override void WriteContentIndex(TextWriter writer)
-		{
-			Dictionary<string, PAKIniItem> list = new(PAKEntries.Count);
-			foreach(PAKEntry item in PAKEntries)
-			{
-				list.Add($"{FolderName}\\{item.Name}", new(item.LongPath));
-			}
-
-			IniSerializer.Serialize(list).Write(writer);
-		}
-
-		/// <inheritdoc/>
-		public override void WriteArchive(EndianStackWriter writer)
-		{
-			int totalLength = PAKEntries.Sum((a) => a.Data.Length);
-
-			writer.WriteUInt(_header);
-			writer.WriteEmpty(33);
-			writer.WriteInt(PAKEntries.Count);
-			writer.WriteInt(totalLength);
-			writer.WriteInt(totalLength);
-			writer.WriteEmpty(8);
-			writer.WriteInt(PAKEntries.Count);
-
-			foreach(PAKEntry item in PAKEntries)
-			{
-				string fullname = $"{FolderName}\\{item.Name}".ToLower();
-				writer.WriteInt(item.LongPath.Length);
-				writer.WriteString(item.LongPath.ToLower());
-				writer.WriteInt(fullname.Length);
-				writer.WriteString(fullname);
-
-				writer.WriteInt(item.Data.Length);
-				writer.WriteInt(item.Data.Length);
-			}
-
-			foreach(PAKEntry item in PAKEntries)
-			{
-				writer.Write(item.Data);
-			}
-		}
-
 
 		/// <summary>
 		/// Converts a texture set to a PAK archive.
@@ -146,208 +213,62 @@ namespace SA3D.Archival.PAK
 		/// <param name="textureSet">The texture set to convert.</param>
 		/// <param name="folderName">The name of the folder that the archive compresses.</param>
 		/// <param name="itemBasePath">The item base path / The long path up until <paramref name="folderName"/> (exclusive). </param>
+		/// <param name="format">Image format to convert to</param>
 		/// <param name="storeIndexInAlpha">Whether the index for indexed textures should be stored in the alpha channel, instead of outputing a grayscale image.</param>
-		/// <param name="useDDS">Whether to convert textures to DDS images, instead of PNG images.</param>
 		/// <returns>The converted PAK archive.</returns>
-		public static PAKArchive FromTextureSet(TextureSet textureSet, string folderName, string itemBasePath, bool storeIndexInAlpha = false, bool useDDS = false)
+		public static PAKArchive FromTextureSet(TextureSet textureSet, string folderName, string itemBasePath, ImageFormat format, bool storeIndexInAlpha = false)
 		{
 			PAKTextureInfo[] textureInfo = new PAKTextureInfo[textureSet.Textures.Count];
 			PAKArchive result = new(folderName);
 
 			for(int i = 0; i < textureSet.Textures.Count; i++)
 			{
-				Texture texture = textureSet.Textures[i];
-				PAKTextureInfo texInfo = new(
-					texture.Name.ToLower(),
-					texture.GlobalIndex,
-					GVRPixelFormat.DXT1,
-					0,
-					GVRPixelFormat.DXT1,
-					(ushort)texture.Width,
-					(ushort)texture.Height,
-					0,
-					default);
+				ITexture texture = textureSet.Textures[i];
+				PAKTextureInfo texInfo = new()
+				{
+					Name = texture.Name.ToLower(),
+					GlobalIndex = texture.GlobalIndex,
+					Type = GVTextureFormat.DXT1,
+					BitDepth = 0,
+					PixelFormat = GVTextureFormat.DXT1,
+					Width = (ushort)texture.Width,
+					Height = (ushort)texture.Height,
+					DataSize = 0,
+					Attributes = default
+				};
 
 				byte[] texData;
 				using(MemoryStream texStream = new())
 				{
 					if(texture is IndexTexture indexTex && indexTex.Palette == null)
 					{
-						if(useDDS)
-						{
-							indexTex.WriteIndexedAsDDS(texStream);
-						}
-						else
-						{
-							indexTex.WriteIndexedAsPNG(texStream, storeIndexInAlpha);
-						}
-
-						texInfo.PixelFormat = texInfo.Type = indexTex.IsIndex4 ? GVRPixelFormat.Index4 : GVRPixelFormat.Index8;
+						indexTex.WriteIndexImage(texStream, format, storeIndexInAlpha);
+						texInfo.PixelFormat = texInfo.Type = indexTex.IsIndex4 ? GVTextureFormat.Index4 : GVTextureFormat.Index8;
 						texInfo.Attributes |= PAKTextureAttributes.Palettized;
 						texInfo.BitDepth = 8;
 					}
 					else
 					{
-						if(useDDS)
-						{
-							texture.WriteColoredAsDDS(texStream);
-						}
-						else
-						{
-							texture.WriteColoredAsPNG(texStream);
-						}
-
-						texInfo.BitDepth = useDDS ? 16u : 32u;
+						texture.WriteImage(texStream, format);
+						texInfo.BitDepth = format == ImageFormat.DDS ? 16u : 32u;
 					}
 
 					texData = texStream.ToArray();
 				}
 
 				string textureName = texInfo.Name + ".dds";
-				result.PAKEntries.Add(new(texData, textureName, $"{itemBasePath}\\{folderName}\\{textureName}"));
+				result.Entries.Add(new(texData, textureName, $"{itemBasePath}\\{folderName}\\{textureName}"));
 				textureInfo[i] = texInfo;
 			}
 
 			using MemoryStream stream = new();
-			EndianStackWriter writer = new(stream);
-			foreach(PAKTextureInfo texInfo in textureInfo)
-			{
-				texInfo.Write(writer);
-			}
+			using BinaryObjectWriter writer = new(stream, StreamOwnership.Retain, Endianness.Little);
+			writer.WriteObjectArray(textureInfo);
 
 			string indexName = folderName + ".inf";
-			result.PAKEntries.Insert(0, new(stream.ToArray(), indexName, $"{itemBasePath}\\{folderName}\\{indexName}"));
+			result.Entries.Insert(0, new(stream.ToArray(), indexName, $"{itemBasePath}\\{folderName}\\{indexName}"));
 
 			return result;
 		}
-
-
-		/// <summary>
-		/// Checks whether the data at specified address can be read as a PAK archive.
-		/// </summary>
-		/// <param name="reader">The reader to read from.</param>
-		/// <param name="address">The address at which</param>
-		/// <returns>Whether the data is a readable PAK archive.</returns>
-		public static bool CheckIsPAKArchive(EndianStackReader reader, uint address)
-		{
-			return reader.ReadUInt(address) == _header;
-		}
-
-		/// <summary>
-		///Checks whether the data at specified address can be read as a PAK archive.
-		/// </summary>
-		/// <param name="data">The data to check.</param>
-		/// <param name="address">The address at which</param>
-		/// <returns></returns>
-		public static bool CheckIsPAKArchive(byte[] data, uint address)
-		{
-			using(EndianStackReader reader = new(data))
-			{
-				return CheckIsPAKArchive(data, address);
-			}
-		}
-
-
-		/// <summary>
-		/// Reads a PAK archive from an endian reader.
-		/// </summary>
-		/// <param name="reader">The reader to read from.</param>
-		/// <param name="address">The address at which the archive is located.</param>
-		/// <param name="folderName">Name of the folder that the archive compressed.</param>
-		/// <returns>The PAK Archive that was read.</returns>
-		/// <exception cref="InvalidArchiveException"/>
-		public static PAKArchive ReadPAKArchive(EndianStackReader reader, uint address, string folderName)
-		{
-			if(!CheckIsPAKArchive(reader, address))
-			{
-				throw new InvalidArchiveException("Data is not a PAK archive.");
-			}
-
-			PAKArchive result = new(folderName);
-
-			int numfiles = reader.ReadInt(address + 0x39);
-			string[] longpaths = new string[numfiles];
-			string[] names = new string[numfiles];
-			uint[] lengths = new uint[numfiles];
-			uint tmpaddr = address + 0x3D;
-
-			for(int i = 0; i < numfiles; i++)
-			{
-				uint stringLength = reader.ReadUInt(tmpaddr);
-				longpaths[i] = reader.ReadString(tmpaddr += 4, Encoding.ASCII, stringLength);
-
-				stringLength = reader.ReadUInt(tmpaddr += stringLength);
-				names[i] = reader.ReadString(tmpaddr += 4, Encoding.ASCII, stringLength);
-
-				lengths[i] = reader.ReadUInt(tmpaddr += stringLength);
-				tmpaddr += 8; // skipping an integer here
-			}
-
-			for(int i = 0; i < numfiles; i++)
-			{
-				byte[] entryData = reader.Source.Slice((int)tmpaddr, (int)lengths[i]).ToArray();
-
-				result.PAKEntries.Add(new(
-					entryData,
-					Path.GetFileName(names[i]),
-					longpaths[i]));
-
-				tmpaddr += lengths[i];
-			}
-
-			return result;
-		}
-
-		/// <summary>
-		/// Reads a PAK archive from an endian reader.
-		/// </summary>
-		/// <param name="reader">The reader to read from.</param>
-		/// <param name="address">The address at which the archive is located.</param>
-		/// <returns>The PAK Archive that was read.</returns>
-		/// <exception cref="InvalidArchiveException"/>
-		public static PAKArchive ReadPAKArchive(EndianStackReader reader, uint address)
-		{
-			return ReadPAKArchive(reader, address, string.Empty);
-		}
-
-		/// <summary>
-		/// Reads a PAK archive from byte data.
-		/// </summary>
-		/// <param name="data">The data to read.</param>
-		/// <param name="address">The address at which the archive is located.</param>
-		/// <param name="folderName">Name of the folder that the archive compressed.</param>
-		/// <returns>The PAK Archive that was read.</returns>
-		/// <exception cref="InvalidArchiveException"/>
-		public static PAKArchive ReadPAKArchive(byte[] data, uint address, string folderName)
-		{
-			using(EndianStackReader reader = new(data))
-			{
-				return ReadPAKArchive(reader, address, folderName);
-			}
-		}
-
-		/// <summary>
-		/// Reads a PAK archive from byte data.
-		/// </summary>
-		/// <param name="data">The data to read.</param>
-		/// <param name="address">The address at which the archive is located.</param>
-		/// <returns>The PAK Archive that was read.</returns>
-		/// <exception cref="InvalidArchiveException"/>
-		public static PAKArchive ReadPAKArchive(byte[] data, uint address)
-		{
-			return ReadPAKArchive(data, address, string.Empty);
-		}
-
-		/// <summary>
-		/// Reads a PAK archive from a file.
-		/// </summary>
-		/// <param name="filePath">Path to the file to read.</param>
-		/// <returns>The PAK Archive that was read.</returns>
-		/// <exception cref="InvalidArchiveException"/>
-		public static PAKArchive ReadPAKArchiveFromFile(string filePath)
-		{
-			return ReadPAKArchive(File.ReadAllBytes(filePath), 0, Path.GetFileNameWithoutExtension(filePath));
-		}
-
 	}
 }

@@ -3,7 +3,7 @@
 	<Import Project="../SA3D.ProjectConfigurations/NuGet.Build.props" />
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<RootNamespace>SA3D.Archival</RootNamespace>
 	</PropertyGroup>
 
@@ -11,7 +11,7 @@
 		<Title>SA3D Archival Library</Title>
 		<Product>SA3D Archival Library</Product>
 		<Description>Archive encoding and decoding library</Description>
-		<Version>1.2.0</Version>
+		<Version>2.0.0</Version>
 		<RepositoryUrl>https://github.com/X-Hax/SA3D.Archival</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/X-Hax/SA3D.Archival</PackageProjectUrl>
 		<PackageId>SA3D.Archival</PackageId>
@@ -23,7 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SA3D.Texturing" Version="1.4.0" />
+	  <PackageReference Include="SA3D.Texturing" Version="2.0.0" />
 	</ItemGroup>
 
 </Project>
