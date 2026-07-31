@@ -84,7 +84,7 @@ namespace SA3D.Archival.Textures.CommonV
 
 
 		/// <inheritdoc/>
-		public abstract bool Check(BinaryObjectReader reader);
+		public abstract bool Check(BinaryObjectReader reader, FileContext context);
 
 		/// <inheritdoc/>
 		public abstract void Read(BinaryObjectReader reader, FileContext context);

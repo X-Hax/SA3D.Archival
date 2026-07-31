@@ -43,11 +43,11 @@ namespace SA3D.Archival
 		/// <returns>Whether an archive was successfully read</returns>
 		public static bool TryReadArchive(BinaryObjectReader reader, FileContext fileContext, [NotNullWhen(true)] out IArchive? result)
 		{
-			if(reader.Check<PAKArchive>())
+			if(reader.Check<PAKArchive>(fileContext))
 			{
 				result = reader.ReadObject<PAKArchive, FileContext>(fileContext);
 			}
-			else if(reader.Check<AFSArchive>())
+			else if(reader.Check<AFSArchive>(fileContext))
 			{
 				result = reader.ReadObject<AFSArchive, FileContext>(fileContext);
 			}

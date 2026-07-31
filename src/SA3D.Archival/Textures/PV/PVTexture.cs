@@ -247,7 +247,7 @@ namespace SA3D.Archival.Textures.PV
 
 
 		/// <inheritdoc/>
-		public override bool Check(BinaryObjectReader reader)
+		public override bool Check(BinaryObjectReader reader, FileContext<TextureIOContext> context)
 		{
 			return VBlock.CheckBlockExists<PVTextureVBlock>(reader);
 		}

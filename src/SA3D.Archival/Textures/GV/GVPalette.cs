@@ -113,7 +113,7 @@ namespace SA3D.Archival.Textures.GV
 
 
 		/// <inheritdoc/>
-		public override bool Check(BinaryObjectReader reader)
+		public override bool Check(BinaryObjectReader reader, FileContext context)
 		{
 			return VBlock.CheckBlockExists<GVPaletteVBlock>(reader);
 		}

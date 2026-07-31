@@ -203,13 +203,14 @@ namespace SA3D.Archival.Textures.CommonV
 
 
 		/// <inheritdoc/>
+		public abstract bool Check(BinaryObjectReader reader, FileContext<TextureIOContext> context);
+
+		/// <inheritdoc/>
 		public abstract void Read(BinaryObjectReader reader, FileContext<TextureIOContext> context);
 
 		/// <inheritdoc/>
 		public abstract void Write(BinaryObjectWriter writer, FileContext<TextureIOContext> context);
 
-		/// <inheritdoc/>
-		public abstract bool Check(BinaryObjectReader reader);
 
 
 		internal abstract void FromBlock(VBlock block);

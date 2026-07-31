@@ -54,7 +54,7 @@ namespace SA3D.Archival.Textures.PVX
 
 
 		/// <inheritdoc/>
-		public bool Check(BinaryObjectReader reader)
+		public bool Check(BinaryObjectReader reader, FileContext context)
 		{
 			using SeekToken seekToken = reader.At();
 			using EndiannessToken endiannessToken = reader.WithEndian(Endianness.Little);

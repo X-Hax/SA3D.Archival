@@ -38,15 +38,15 @@ namespace SA3D.Archival.Textures
 		/// <returns>Whether an archive was successfully read</returns>
 		public static bool TryReadTextureArchive(BinaryObjectReader reader, FileContext fileContext, [NotNullWhen(true)] out ITextureArchive? result)
 		{
-			if(reader.Check<PVArchive>())
+			if(reader.Check<PVArchive>(fileContext))
 			{
 				result = reader.ReadObject<PVArchive, FileContext>(fileContext);
 			}
-			else if(reader.Check<GVArchive>())
+			else if(reader.Check<GVArchive>(fileContext))
 			{
 				result = reader.ReadObject<GVArchive, FileContext>(fileContext);
 			}
-			else if(reader.Check<PVXArchive>())
+			else if(reader.Check<PVXArchive>(fileContext))
 			{
 				result = reader.ReadObject<PVXArchive, FileContext>(fileContext);
 			}
