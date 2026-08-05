@@ -88,7 +88,7 @@ namespace SA3D.Archival.Textures.PV
 				PVTexture pvr = Entries[i];
 				string name = string.IsNullOrWhiteSpace(pvr.Name) ? i.ToString() : pvr.Name;
 				string pvrPath = Path.Join(folderPath, name + ".pvr");
-				FileUtil.WriteToFile(pvr, new() { Filepath = pvrPath }, context);
+				pvr.WriteToFile(context, pvrPath);
 			}
 		}
 
@@ -103,7 +103,7 @@ namespace SA3D.Archival.Textures.PV
 				PVPalette palette = Palettes[i];
 				string name = string.IsNullOrWhiteSpace(palette.Name) ? i.ToString() : palette.Name;
 				string pvpPath = Path.Join(folderPath, name + ".pvp");
-				FileUtil.WriteToFile(palette, new() { Filepath = pvpPath });
+				palette.WriteToFile(pvpPath);
 			}
 		}
 
@@ -131,20 +131,20 @@ namespace SA3D.Archival.Textures.PV
 		}
 
 		/// <inheritdoc/>
-		public override bool Check(BinaryObjectReader reader, FileContext context)
+		protected override bool CheckCanReadFile(BinaryObjectReader reader, ref FileIOInfo info)
 		{
 			return PVArchiveIO.Check(reader);
 		}
 
 		/// <inheritdoc/>
-		public override void Read(BinaryObjectReader reader, FileContext context)
+		protected override void Read(BinaryObjectReader reader)
 		{
 			VBlock[] blocks = PVBlocks.ReadPVBlocks(reader);
 			PVArchiveIO.Read(this, blocks);
 		}
 
 		/// <inheritdoc/>
-		public override void Write(BinaryObjectWriter writer, FileContext context)
+		protected override void Write(BinaryObjectWriter writer)
 		{
 			PVArchiveIO.Write(this, writer);
 		}

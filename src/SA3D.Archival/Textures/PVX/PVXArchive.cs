@@ -53,8 +53,7 @@ namespace SA3D.Archival.Textures.PVX
 		}
 
 
-		/// <inheritdoc/>
-		public bool Check(BinaryObjectReader reader, FileContext context)
+		bool IFileSerializable.CheckCanReadFile(BinaryObjectReader reader, ref FileIOInfo fileInfo)
 		{
 			using SeekToken seekToken = reader.At();
 			using EndiannessToken endiannessToken = reader.WithEndian(Endianness.Little);
@@ -67,8 +66,7 @@ namespace SA3D.Archival.Textures.PVX
 				&& (version is > 0 and <= _version);
 		}
 
-		/// <inheritdoc/>
-		public void Read(BinaryObjectReader reader, FileContext context)
+		void IBinarySerializable.Read(BinaryObjectReader reader)
 		{
 			if(reader.ReadUInt32() != _pvmxHeader)
 			{
@@ -92,35 +90,18 @@ namespace SA3D.Archival.Textures.PVX
 				return reader.ReadByte() != 0;
 			}
 
-			FileContext<TextureIOContext> textureContext = new()
-			{
-				Context = new()
-				{
-					DataOnly = true
-				}
-			};
-
 			Entries = [];
 			while(HasData())
 			{
-				Entries.Add(reader.ReadObject<PVXTexture, FileContext<TextureIOContext>>(textureContext));
+				Entries.Add(reader.ReadObject<PVXTexture, TextureIOContext>(new() { DataOnly = true }));
 			}
 		}
 
-		/// <inheritdoc/>
-		public void Write(BinaryObjectWriter writer, FileContext context)
+		void IBinarySerializable.Write(BinaryObjectWriter writer)
 		{
-			FileContext<TextureIOContext> textureContext = new()
-			{
-				Context = new()
-				{
-					DataOnly = true
-				}
-			};
-
 			writer.WriteUInt32(_pvmxHeader);
 			writer.WriteByte(_version);
-			writer.WriteObjectArray(Entries, textureContext);
+			writer.WriteObjectArray(Entries, new TextureIOContext() { DataOnly = true });
 		}
 
 		/// <inheritdoc/>

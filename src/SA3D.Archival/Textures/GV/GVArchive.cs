@@ -78,10 +78,10 @@ namespace SA3D.Archival.Textures.GV
 
 			for(int i = 0; i < Entries.Count; i++)
 			{
-				GVTexture pvr = Entries[i];
-				string name = string.IsNullOrWhiteSpace(pvr.Name) ? i.ToString() : pvr.Name;
+				GVTexture gvr = Entries[i];
+				string name = string.IsNullOrWhiteSpace(gvr.Name) ? i.ToString() : gvr.Name;
 				string gvrPath = Path.Join(folderPath, name + ".gvr");
-				FileUtil.WriteToFile(pvr, new() { Filepath = gvrPath }, context);
+				gvr.WriteToFile(context, gvrPath);
 			}
 		}
 
@@ -96,7 +96,7 @@ namespace SA3D.Archival.Textures.GV
 				GVPalette palette = Palettes[i];
 				string name = string.IsNullOrWhiteSpace(palette.Name) ? i.ToString() : palette.Name;
 				string gvpPath = Path.Join(folderPath, name + ".gvp");
-				FileUtil.WriteToFile(palette, new() { Filepath = gvpPath });
+				palette.WriteToFile(gvpPath);
 			}
 		}
 
@@ -126,21 +126,22 @@ namespace SA3D.Archival.Textures.GV
 			};
 		}
 
+
 		/// <inheritdoc/>
-		public override bool Check(BinaryObjectReader reader, FileContext context)
+		protected override bool CheckCanReadFile(BinaryObjectReader reader, ref FileIOInfo info)
 		{
 			return GVArchiveIO.Check(reader);
 		}
 
 		/// <inheritdoc/>
-		public override void Read(BinaryObjectReader reader, FileContext context)
+		protected override void Read(BinaryObjectReader reader)
 		{
 			VBlock[] blocks = GVBlocks.ReadGVBlocks(reader);
 			GVArchiveIO.Read(this, blocks);
 		}
 
 		/// <inheritdoc/>
-		public override void Write(BinaryObjectWriter writer, FileContext context)
+		protected override void Write(BinaryObjectWriter writer)
 		{
 			GVArchiveIO.Write(this, writer);
 		}

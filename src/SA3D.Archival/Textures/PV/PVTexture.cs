@@ -247,19 +247,14 @@ namespace SA3D.Archival.Textures.PV
 
 
 		/// <inheritdoc/>
-		public override bool Check(BinaryObjectReader reader, FileContext<TextureIOContext> context)
+		protected override bool CheckCanReadFile(BinaryObjectReader reader, TextureIOContext context, ref FileIOInfo info)
 		{
 			return VBlock.CheckBlockExists<PVTextureVBlock>(reader);
 		}
 
 		/// <inheritdoc/>
-		public override void Read(BinaryObjectReader reader, FileContext<TextureIOContext> context)
+		protected override void Read(BinaryObjectReader reader, TextureIOContext context)
 		{
-			if(!context.Context.DataOnly && !string.IsNullOrEmpty(context.Filepath))
-			{
-				Name = Path.GetFileNameWithoutExtension(context.Filepath);
-			}
-
 			VBlock[] blocks = PVBlocks.ReadPVBlocks(reader);
 
 			PVTextureVBlock block = blocks.OfType<PVTextureVBlock>().FirstOrDefault()
@@ -278,11 +273,11 @@ namespace SA3D.Archival.Textures.PV
 		}
 
 		/// <inheritdoc/>
-		public override void Write(BinaryObjectWriter writer, FileContext<TextureIOContext> context)
+		protected override void Write(BinaryObjectWriter writer, TextureIOContext context)
 		{
 			VBlockAlignment alignment = new(writer.Position, 32);
 
-			if(context.Context.IncludeGlobalIndex)
+			if(context.IncludeGlobalIndex)
 			{
 				writer.WriteObject(new GlobalIndexVBlock(GlobalIndex));
 			}

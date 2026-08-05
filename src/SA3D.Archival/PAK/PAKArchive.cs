@@ -56,23 +56,23 @@ namespace SA3D.Archival.PAK
 		public PAKArchive() : this(string.Empty) { }
 
 
-		/// <inheritdoc/>
-		public bool Check(BinaryObjectReader reader, FileContext context)
+		bool IFileSerializable.CheckCanReadFile(BinaryObjectReader reader, ref FileIOInfo fileInfo)
 		{
 			using SeekToken seekToken = reader.At();
 			using EndiannessToken endiannessToken = reader.WithEndian(Endianness.Little);
 
-			return reader.ReadUInt32() == _header;
-		}
+			bool result = reader.ReadUInt32() == _header;
 
-		/// <inheritdoc/>
-		public void Read(BinaryObjectReader reader, FileContext context)
-		{
-			if(context.Filepath != null)
+			if(result)
 			{
-				FolderName = Path.GetFileNameWithoutExtension(context.Filepath);
+				fileInfo.Endianness ??= Endianness.Little;
 			}
 
+			return result;
+		}
+
+		void IBinarySerializable.Read(BinaryObjectReader reader)
+		{
 			Entries = [];
 
 			reader.Skip(0x39);
@@ -104,8 +104,7 @@ namespace SA3D.Archival.PAK
 			}
 		}
 
-		/// <inheritdoc/>
-		public void Write(BinaryObjectWriter writer, FileContext context)
+		void IBinarySerializable.Write(BinaryObjectWriter writer)
 		{
 			int totalLength = Entries.Sum((a) => a.Data.Length);
 
@@ -134,6 +133,16 @@ namespace SA3D.Archival.PAK
 			{
 				writer.WriteArray(item.Data);
 			}
+		}
+
+		void IFileSerializable.ReadFile(BinaryObjectReader reader, FileIOInfo info)
+		{
+			if(info.Filepath != null)
+			{
+				FolderName = Path.GetFileNameWithoutExtension(info.Filepath);
+			}
+
+			reader.ReadObject(this);
 		}
 
 		/// <inheritdoc/>

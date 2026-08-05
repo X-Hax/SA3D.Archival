@@ -1,3 +1,6 @@
+[![NuGet](https://img.shields.io/nuget/v/SA3D.Archival)](https://www.nuget.org/packages/SA3D.Archival) 
+[![downloads](https://img.shields.io/nuget/dt/SA3D.Archival)](https://www.nuget.org/packages/SA3D.Archival)
+
 # SA3D.Archival
 SA3D Archive reader and writer.
 

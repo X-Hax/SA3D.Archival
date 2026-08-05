@@ -10,7 +10,7 @@ namespace SA3D.Archival
 		/// <summary>
 		/// Name of the Entry
 		/// </summary>
-		public string Name { get; }
+		public string Name { get; set; }
 
 		/// <summary>
 		/// Archive data

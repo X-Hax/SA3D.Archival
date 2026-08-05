@@ -124,19 +124,14 @@ namespace SA3D.Archival.Textures.PV
 
 
 		/// <inheritdoc/>
-		public override bool Check(BinaryObjectReader reader, FileContext context)
+		protected override bool CheckCanReadFile(BinaryObjectReader reader, ref FileIOInfo info)
 		{
 			return VBlock.CheckBlockExists<PVPaletteVBlock>(reader);
 		}
 
 		/// <inheritdoc/>
-		public override void Read(BinaryObjectReader reader, FileContext context)
+		protected override void Read(BinaryObjectReader reader)
 		{
-			if(!string.IsNullOrEmpty(context.Filepath))
-			{
-				Name = Path.GetFileNameWithoutExtension(context.Filepath);
-			}
-
 			VBlock[] blocks = PVBlocks.ReadPVBlocks(reader);
 
 			PVPaletteVBlock block = blocks.OfType<PVPaletteVBlock>().FirstOrDefault()
@@ -150,7 +145,7 @@ namespace SA3D.Archival.Textures.PV
 		}
 
 		/// <inheritdoc/>
-		public override void Write(BinaryObjectWriter writer, FileContext context)
+		protected override void Write(BinaryObjectWriter writer)
 		{
 			writer.WriteObject(ToBlock(), new VBlockAlignment(writer.Position, 4));
 		}

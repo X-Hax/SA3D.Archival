@@ -35,17 +35,22 @@ namespace SA3D.Archival.AFS
 		}
 
 
-		/// <inheritdoc/>
-		public bool Check(BinaryObjectReader reader, FileContext context)
+		bool IFileSerializable.CheckCanReadFile(BinaryObjectReader reader, ref FileIOInfo fileInfo)
 		{
 			using SeekToken seekToken = reader.At();
 			using EndiannessToken endiannessToken = reader.WithEndian(Endianness.Little);
 
-			return reader.ReadUInt32() == _header;
+			bool result = reader.ReadUInt32() == _header;
+
+			if(result)
+			{
+				fileInfo.Endianness ??= Endianness.Little;
+			}
+
+			return result;
 		}
 
-		/// <inheritdoc/>
-		public void Read(BinaryObjectReader reader, FileContext context)
+		void IBinarySerializable.Read(BinaryObjectReader reader)
 		{
 			using OffsetOriginToken offsetOriginToken = reader.WithOffsetOrigin();
 
@@ -79,8 +84,7 @@ namespace SA3D.Archival.AFS
 			}
 		}
 
-		/// <inheritdoc/>
-		public void Write(BinaryObjectWriter writer, FileContext context)
+		void IBinarySerializable.Write(BinaryObjectWriter writer)
 		{
 			using OffsetOriginToken offsetOriginToken = writer.WithOffsetOrigin();
 
@@ -114,5 +118,6 @@ namespace SA3D.Archival.AFS
 		{
 			throw new NotSupportedException();
 		}
+
 	}
 }

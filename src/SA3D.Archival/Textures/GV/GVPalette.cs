@@ -113,19 +113,14 @@ namespace SA3D.Archival.Textures.GV
 
 
 		/// <inheritdoc/>
-		public override bool Check(BinaryObjectReader reader, FileContext context)
+		protected override bool CheckCanReadFile(BinaryObjectReader reader, ref FileIOInfo info)
 		{
 			return VBlock.CheckBlockExists<GVPaletteVBlock>(reader);
 		}
 
 		/// <inheritdoc/>
-		public override void Read(BinaryObjectReader reader, FileContext context)
+		protected override void Read(BinaryObjectReader reader)
 		{
-			if(!string.IsNullOrEmpty(context.Filepath))
-			{
-				Name = Path.GetFileNameWithoutExtension(context.Filepath);
-			}
-
 			VBlock[] blocks = GVBlocks.ReadGVBlocks(reader);
 
 			GVPaletteVBlock block = blocks.OfType<GVPaletteVBlock>().FirstOrDefault()
@@ -139,7 +134,7 @@ namespace SA3D.Archival.Textures.GV
 		}
 
 		/// <inheritdoc/>
-		public override void Write(BinaryObjectWriter writer, FileContext context)
+		protected override void Write(BinaryObjectWriter writer)
 		{
 			writer.WriteObject(ToBlock(), new VBlockAlignment(writer.Position, 4));
 		}

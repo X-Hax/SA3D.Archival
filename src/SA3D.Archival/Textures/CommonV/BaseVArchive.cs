@@ -83,14 +83,38 @@ namespace SA3D.Archival.Textures.CommonV
 		}
 
 
-		/// <inheritdoc/>
-		public abstract bool Check(BinaryObjectReader reader, FileContext context);
+		bool IFileSerializable.CheckCanReadFile(BinaryObjectReader reader, ref FileIOInfo fileInfo)
+		{
+			return CheckCanReadFile(reader, ref fileInfo);
+		}
 
-		/// <inheritdoc/>
-		public abstract void Read(BinaryObjectReader reader, FileContext context);
+		/// <summary>
+		/// Implementation for <see cref="IFileSerializable.CheckCanReadFile(BinaryObjectReader, ref FileIOInfo)"/>
+		/// </summary>
+		protected abstract bool CheckCanReadFile(BinaryObjectReader reader, ref FileIOInfo fileInfo);
 
-		/// <inheritdoc/>
-		public abstract void Write(BinaryObjectWriter writer, FileContext context);
+
+		void IBinarySerializable.Read(BinaryObjectReader reader)
+		{
+			Read(reader);
+		}
+
+		/// <summary>
+		/// Implementation for <see cref="IBinarySerializable.Read(BinaryObjectReader)"/>
+		/// </summary>
+		protected abstract void Read(BinaryObjectReader reader);
+
+
+		void IBinarySerializable.Write(BinaryObjectWriter writer)
+		{
+			Write(writer);
+		}
+
+		/// <summary>
+		/// Implementation for <see cref="IBinarySerializable.Write(BinaryObjectWriter)"/>
+		/// </summary>
+		protected abstract void Write(BinaryObjectWriter writer);
+
 
 		/// <inheritdoc/>
 		public string WriteContentIndex()
@@ -100,5 +124,6 @@ namespace SA3D.Archival.Textures.CommonV
 
 
 		internal abstract VBlock ToBlock(VArchiveIncludes includes);
+
 	}
 }

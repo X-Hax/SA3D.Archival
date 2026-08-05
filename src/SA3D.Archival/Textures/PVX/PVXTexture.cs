@@ -152,8 +152,7 @@ namespace SA3D.Archival.Textures.PVX
 		}
 
 
-		/// <inheritdoc/>
-		public bool Check(BinaryObjectReader reader, FileContext<TextureIOContext> context)
+		bool IFileSerializable<TextureIOContext>.CheckCanReadFile(BinaryObjectReader reader, TextureIOContext context, ref FileIOInfo fileInfo)
 		{
 			using SeekToken seekToken = reader.At();
 			using EndiannessToken endiannessToken = reader.WithEndian(Endianness.Little);
@@ -166,10 +165,9 @@ namespace SA3D.Archival.Textures.PVX
 				&& (version is > 0 and <= _version);
 		}
 
-		/// <inheritdoc/>
-		public void Read(BinaryObjectReader reader, FileContext<TextureIOContext> context)
+		void IBinarySerializable<TextureIOContext>.Read(BinaryObjectReader reader, TextureIOContext context)
 		{
-			if(!context.Context.DataOnly)
+			if(!context.DataOnly)
 			{
 				if(reader.ReadUInt32() != _pvrxHeader)
 				{
@@ -181,10 +179,6 @@ namespace SA3D.Archival.Textures.PVX
 				{
 					throw new InvalidDataException($"PVRX has unsupported version {version}!");
 				}
-			}
-			else if(!string.IsNullOrEmpty(context.Filepath))
-			{
-				Name = Path.GetFileNameWithoutExtension(context.Filepath);
 			}
 
 			for(PVXArchiveDictionaryField type = (PVXArchiveDictionaryField)reader.ReadByte();
@@ -220,10 +214,9 @@ namespace SA3D.Archival.Textures.PVX
 			Data = reader.ReadArrayAtOffset<byte>(offset, (int)length);
 		}
 
-		/// <inheritdoc/>
-		public void Write(BinaryObjectWriter writer, FileContext<TextureIOContext> context)
+		void IBinarySerializable<TextureIOContext>.Write(BinaryObjectWriter writer, TextureIOContext context)
 		{
-			if(!context.Context.DataOnly)
+			if(!context.DataOnly)
 			{
 				writer.WriteUInt32(_pvrxHeader);
 				writer.WriteByte(_version);
@@ -251,7 +244,7 @@ namespace SA3D.Archival.Textures.PVX
 
 			writer.WriteOffsetValue(Data.LongLength);
 
-			if(!context.Context.DataOnly)
+			if(!context.DataOnly)
 			{
 				writer.Align(4);
 			}

@@ -202,14 +202,37 @@ namespace SA3D.Archival.Textures.CommonV
 		}
 
 
-		/// <inheritdoc/>
-		public abstract bool Check(BinaryObjectReader reader, FileContext<TextureIOContext> context);
+		bool IFileSerializable<TextureIOContext>.CheckCanReadFile(BinaryObjectReader reader, TextureIOContext context, ref FileIOInfo fileInfo)
+		{
+			return CheckCanReadFile(reader, context, ref fileInfo);
+		}
 
-		/// <inheritdoc/>
-		public abstract void Read(BinaryObjectReader reader, FileContext<TextureIOContext> context);
+		/// <summary>
+		/// Implementation for <see cref="IFileSerializable.CheckCanReadFile(BinaryObjectReader, ref FileIOInfo)"/>
+		/// </summary>
+		protected abstract bool CheckCanReadFile(BinaryObjectReader reader, TextureIOContext context, ref FileIOInfo fileInfo);
 
-		/// <inheritdoc/>
-		public abstract void Write(BinaryObjectWriter writer, FileContext<TextureIOContext> context);
+
+		void IBinarySerializable<TextureIOContext>.Read(BinaryObjectReader reader, TextureIOContext context)
+		{
+			Read(reader, context);
+		}
+
+		/// <summary>
+		/// Implementation for <see cref="IBinarySerializable.Read(BinaryObjectReader)"/>
+		/// </summary>
+		protected abstract void Read(BinaryObjectReader reader, TextureIOContext context);
+
+
+		void IBinarySerializable<TextureIOContext>.Write(BinaryObjectWriter writer, TextureIOContext context)
+		{
+			Write(writer, context);
+		}
+
+		/// <summary>
+		/// Implementation for <see cref="IBinarySerializable.Write(BinaryObjectWriter)"/>
+		/// </summary>
+		protected abstract void Write(BinaryObjectWriter writer, TextureIOContext context);
 
 
 
