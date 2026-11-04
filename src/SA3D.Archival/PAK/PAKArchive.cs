@@ -208,8 +208,6 @@ namespace SA3D.Archival.PAK
 
 				tex.GlobalIndex = texInfo.GlobalIndex;
 				tex.Name = Path.GetFileNameWithoutExtension(texInfo.Name);
-				tex.OverrideWidth = (int)texInfo.Width;
-				tex.OverrideHeight = (int)texInfo.Height;
 				textures.Add(tex);
 			}
 
