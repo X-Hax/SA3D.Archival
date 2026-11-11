@@ -60,26 +60,23 @@ namespace SA3D.Archival.Textures.CommonV.IO
 			}
 		}
 
-		public static VBlock[] ReadVBlocks(BinaryObjectReader reader, Type[] additionalBlockTypes)
+		public static VBlock[] ReadVBlocks(BinaryObjectReader reader, Func<VBlock>[] additionalBlockConstructors)
 		{
-			Type[] blockTypes = [
-				typeof(CommentVBlock),
-				typeof(ConverterNameVBlock),
-				typeof(GlobalIndexVBlock),
-				typeof(ImageDataVBlock),
-				typeof(ModelNamesVBlock),
-				..additionalBlockTypes,
+			Func<VBlock>[] blockConstructors = [
+				() => new CommentVBlock(),
+				() => new CommentVBlock(),
+				() => new ConverterNameVBlock(),
+				() => new GlobalIndexVBlock(),
+				() => new ImageDataVBlock(),
+				() => new ModelNamesVBlock(),
+				..additionalBlockConstructors,
 			];
 
-			Dictionary<string, Type> lut = [];
-			foreach(Type blockType in blockTypes)
+			Dictionary<string, Func<VBlock>> lut = [];
+			foreach(Func<VBlock> blockConstructor in blockConstructors)
 			{
-				if(Activator.CreateInstance(blockType) is not VBlock block)
-				{
-					throw new ArgumentException($"Type \"{blockType}\" does not inherit from VBlock!");
-				}
-
-				lut[block.Header] = blockType;
+				VBlock block = blockConstructor();
+				lut[block.Header] = blockConstructor;
 			}
 
 			List<VBlock> result = [];
@@ -98,12 +95,12 @@ namespace SA3D.Archival.Textures.CommonV.IO
 					}
 				}
 
-				if(!lut.TryGetValue(blockHeader, out Type? blockType))
+				if(!lut.TryGetValue(blockHeader, out Func<VBlock>? blockConstructor))
 				{
-					blockType = typeof(UnknownVBlock);
+					blockConstructor = () => new UnknownVBlock();
 				}
 
-				VBlock block = (VBlock)Activator.CreateInstance(blockType)!;
+				VBlock block = blockConstructor();
 				block.Read(reader, default);
 				result.Add(block);
 			}
